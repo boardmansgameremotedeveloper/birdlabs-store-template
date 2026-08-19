@@ -21,12 +21,22 @@
   assign badge = product.metafields.custom.badge.value
   assign tagline = product.metafields.custom.tagline.value
   assign collection_handles = product.collections | map: 'handle' | join: ' '
+
+  # One attribute carries every key this card can be filtered by — its collection handles
+  # AND its tags — pipe-delimited so a prefix cannot match inside a longer key. The section
+  # compares chip values against this list whichever chip strategy is in use.
+  assign filter_keys = product.collections | map: 'handle' | join: '|'
+  assign tag_keys = product.tags | join: '|'
+  if tag_keys != blank
+    assign filter_keys = filter_keys | append: '|' | append: tag_keys
+  endif
 -%}
 
 <div
   class="birdlabs-product-card"
   data-product-handle="{{ product.handle }}"
   data-collections="{{ collection_handles }}"
+  data-filter-keys="{{ filter_keys | escape }}"
 >
   {%- if badge != blank -%}
     <div class="birdlabs-product-card__badge">{{ badge | escape }}</div>

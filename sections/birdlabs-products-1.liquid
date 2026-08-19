@@ -31,6 +31,36 @@
     assign anchor = 'birdlabs-products-' | append: section.id
   endif
   assign product_limit = section.settings.products_shown
+
+  # SOURCE. Blank means the whole catalogue. Set it and this section shows only that
+  # collection — which is what makes several demo storefronts able to share one store
+  # without each one leaking the others' products into its grid.
+  assign source = collections.all
+  if section.settings.source_collection != blank
+    assign source = collections[section.settings.source_collection]
+  endif
+
+  # CHIPS. Two strategies:
+  #   collections — a button per store collection (the FLTHQ behaviour). Simple, but it
+  #                 lists every collection in the store, so it leaks across demo tenants.
+  #   tags        — a button per distinct prefixed tag found on the products ACTUALLY
+  #                 RENDERED. Self-scoping: change the source and the chips follow.
+  assign prefix = section.settings.tag_prefix | strip
+  assign chip_keys = ''
+  if section.settings.category_source == 'tags' and prefix != blank
+    for product in source.products limit: product_limit
+      for tag in product.tags
+        if tag contains prefix
+          # Delimit both sides so "cat:min" cannot match inside "cat:minerals".
+          assign probe = '|' | append: tag | append: '|'
+          unless chip_keys contains probe
+            assign chip_keys = chip_keys | append: probe
+          endunless
+        endif
+      endfor
+    endfor
+  endif
+  assign chip_list = chip_keys | split: '|' | sort
 -%}
 
 <section id="{{ anchor }}" class="birdlabs-products" data-section-id="{{ section.id }}">
@@ -57,32 +87,51 @@
           {{ section.settings.all_label | escape }}
         </button>
 
-        {%- for collection in collections -%}
-          {%- if collection.products_count > 0
-            and collection.handle != 'frontpage'
-            and collection.handle != 'all'
-          -%}
-            <button
-              class="birdlabs-products__filter"
-              type="button"
-              data-filter="{{ collection.handle }}"
-              aria-pressed="false"
-            >
-              {{ collection.title | escape }}
-            </button>
-          {%- endif -%}
-        {%- endfor -%}
+        {%- if section.settings.category_source == 'tags' -%}
+          {%- for tag in chip_list -%}
+            {%- if tag != blank -%}
+              <button
+                class="birdlabs-products__filter"
+                type="button"
+                data-filter="{{ tag | escape }}"
+                aria-pressed="false"
+              >
+                {{ tag | remove_first: prefix | replace: '-', ' ' | capitalize | escape }}
+              </button>
+            {%- endif -%}
+          {%- endfor -%}
+        {%- else -%}
+          {%- for collection in collections -%}
+            {%- if collection.products_count > 0
+              and collection.handle != 'frontpage'
+              and collection.handle != 'all'
+            -%}
+              <button
+                class="birdlabs-products__filter"
+                type="button"
+                data-filter="{{ collection.handle }}"
+                aria-pressed="false"
+              >
+                {{ collection.title | escape }}
+              </button>
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
       </div>
     {%- endif -%}
 
     <div class="birdlabs-products__grid" data-product-grid>
-      {%- for product in collections.all.products limit: product_limit -%}
+      {%- for product in source.products limit: product_limit -%}
         <div class="birdlabs-reveal birdlabs-products__cell" style="transition-delay: {{ forloop.index0 | times: 0.06 }}s">
           {% render 'birdlabs-product-card', product: product %}
         </div>
       {%- else -%}
         <p class="birdlabs-products__empty">
-          No products yet. Add products to this store and they appear here automatically.
+          {%- if section.settings.source_collection != blank -%}
+            Nothing in that collection yet.
+          {%- else -%}
+            No products yet. Add products to this store and they appear here automatically.
+          {%- endif -%}
         </p>
       {%- endfor -%}
     </div>
@@ -118,8 +167,10 @@
 
         cells.forEach(function (cell) {
           var card = cell.querySelector('.birdlabs-product-card');
-          var handles = card ? (card.dataset.collections || '').split(/\s+/) : [];
-          var match = wanted === 'all' || handles.indexOf(wanted) !== -1;
+          // One attribute carries both collection handles and prefixed tags, so the same
+          // comparison serves either chip strategy.
+          var keys = card ? (card.dataset.filterKeys || '').split('|') : [];
+          var match = wanted === 'all' || keys.indexOf(wanted) !== -1;
           cell.classList.toggle('is-hidden', !match);
           if (match) shown++;
         });
@@ -443,11 +494,35 @@
     },
     {
       "type": "header",
+      "content": "Which products"
+    },
+    {
+      "type": "collection",
+      "id": "source_collection",
+      "label": "Source collection",
+      "info": "Leave blank for the whole catalogue. Set it to scope this section to one storefront's products — how several demo sites share one store."
+    },
+    {
+      "type": "header",
       "content": "Category filters"
     },
     {
-      "type": "paragraph",
-      "content": "A button is generated for every collection that contains at least one product. Create collections in the store admin to add categories — no theme change needed."
+      "type": "select",
+      "id": "category_source",
+      "label": "Build filter buttons from",
+      "default": "tags",
+      "info": "Tags are scoped to the products actually shown, so they follow the source collection. Collections list every collection in the store.",
+      "options": [
+        { "value": "tags", "label": "Product tags (recommended)" },
+        { "value": "collections", "label": "Store collections" }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "tag_prefix",
+      "label": "Category tag prefix",
+      "info": "Tags starting with this become filter buttons. With \"cat:\", a product tagged cat:gummies gets a \"Gummies\" button.",
+      "default": "cat:"
     },
     {
       "type": "checkbox",

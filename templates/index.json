@@ -51,7 +51,10 @@
         "anchor_id": "products",
         "show_filters": true,
         "all_label": "All products",
-        "products_shown": 24
+        "products_shown": 24,
+        "source_collection": "demo-template",
+        "category_source": "tags",
+        "tag_prefix": "cat:"
       }
     },
     "birdlabs_story_demo": {
