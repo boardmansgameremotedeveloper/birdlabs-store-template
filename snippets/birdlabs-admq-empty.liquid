@@ -1,0 +1,44 @@
+{% comment %}
+  snippets/birdlabs-admq-empty.liquid
+
+  An unfilled ad-marquee slot.
+
+  It keeps the diagonal-stripe "available inventory" look, but it is a LINK to a product
+  rather than a dead rectangle — so unsold space still sells something. Products cycle by
+  index, so several empty slots do not all point at the same item.
+
+  Params:
+    filler — product list to draw from
+    index  — slot position, used to pick a product
+    pass   — 1 or 2; the marquee renders its track twice for a seamless loop, and the
+             duplicate must stay out of the tab order and hidden from screen readers
+    label  — text shown on the slot ("Advertise here")
+{% endcomment %}
+
+{%- liquid
+  assign pool_size = filler.size
+  assign product = nil
+  if pool_size > 0
+    assign pick = index | modulo: pool_size
+    assign product = filler[pick]
+  endif
+-%}
+
+{%- if product != blank -%}
+  <a
+    class="birdlabs-admq__slot birdlabs-admq__slot--empty"
+    href="{{ product.url }}"
+    {% if pass == 2 %}tabindex="-1" aria-hidden="true"{% endif %}
+  >
+    <span class="birdlabs-admq__empty-label">
+      {{- label | default: 'Advertise here' | escape -}}
+    </span>
+  </a>
+{%- else -%}
+  {%- comment -%} No products to point at — fall back to the inert placeholder. {%- endcomment -%}
+  <span class="birdlabs-admq__slot birdlabs-admq__slot--empty" aria-hidden="true">
+    <span class="birdlabs-admq__empty-label">
+      {{- label | default: 'Advertise here' | escape -}}
+    </span>
+  </span>
+{%- endif -%}

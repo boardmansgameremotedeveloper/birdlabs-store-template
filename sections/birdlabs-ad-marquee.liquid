@@ -36,6 +36,14 @@
 {% endcomment %}
 
 {%- liquid
+  # An unfilled slot used to be a dead striped rectangle. It still LOOKS like available
+  # inventory, but it now links to a product, so the space sells something either way.
+  # Products cycle by index so five empty slots do not all point at the same item.
+  assign filler = collections.all.products
+  if section.settings.fallback_collection != blank
+    assign filler = collections[section.settings.fallback_collection].products
+  endif
+
   assign slot_w = section.settings.slot_width
   assign slot_h = section.settings.slot_height
   assign ad_blocks = section.blocks | where: 'type', 'slot'
@@ -86,7 +94,9 @@
                   }}
                 </a>
               {%- else -%}
-                <span class="birdlabs-admq__slot birdlabs-admq__slot--empty" aria-hidden="true"></span>
+                {%- render 'birdlabs-admq-empty',
+                  filler: filler, index: forloop.index0, pass: pass,
+                  label: section.settings.empty_label -%}
               {%- endif -%}
             {%- endfor -%}
 
@@ -95,7 +105,10 @@
               the point of the original design, not an oversight.
             {%- endcomment -%}
             {%- for i in (1..placeholders) -%}
-              <span class="birdlabs-admq__slot birdlabs-admq__slot--empty" aria-hidden="true"></span>
+              {%- assign offset = ad_blocks.size | plus: forloop.index0 -%}
+              {%- render 'birdlabs-admq-empty',
+                filler: filler, index: offset, pass: pass,
+                label: section.settings.empty_label -%}
             {%- endfor -%}
           </div>
         {%- endfor -%}
@@ -174,6 +187,24 @@
    * because a black-on-dark placeholder is invisible — which defeats the entire point of
    * showing unsold inventory. Default suits a dark bar; lighten it for a light one.
    */
+  .birdlabs-admq__empty-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: var(--bl-fg);
+    font-family: var(--font-body--family);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    opacity: 0.55;
+  }
+
+  a.birdlabs-admq__slot--empty:hover .birdlabs-admq__empty-label { opacity: 0.9; }
+
   .birdlabs-admq__slot--empty {
     background: repeating-linear-gradient(
       45deg,
@@ -227,6 +258,22 @@
     {
       "type": "header",
       "content": "Strip"
+    },
+    {
+      "type": "paragraph",
+      "content": "Slots you have not filled with a creative still show as available inventory \u2014 but they link to a product rather than nowhere, so the space is never wasted."
+    },
+    {
+      "type": "collection",
+      "id": "fallback_collection",
+      "label": "Products for unfilled slots",
+      "info": "Leave blank to use the whole catalogue."
+    },
+    {
+      "type": "text",
+      "id": "empty_label",
+      "label": "Unfilled slot text",
+      "default": "Advertise here"
     },
     {
       "type": "range",

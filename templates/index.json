@@ -175,41 +175,41 @@
         "s1": {
           "type": "slot",
           "settings": {
-            "image": "shopify://shop_images/advertise-here-1.png",
-            "link": "/pages/contact",
-            "alt": "Advertise here \u2014 this ad slot is available"
+            "image": "shopify://shop_images/advertiser-florabella.png",
+            "link": "/collections/demo-buyflorabella",
+            "alt": "Flora Bella \u2014 wake up your soil"
           }
         },
         "s2": {
           "type": "slot",
           "settings": {
-            "image": "shopify://shop_images/advertise-here-2.png",
-            "link": "/pages/contact",
-            "alt": "Advertise here \u2014 this ad slot is available"
+            "image": "",
+            "link": "",
+            "alt": ""
           }
         },
         "s3": {
           "type": "slot",
           "settings": {
-            "image": "shopify://shop_images/advertise-here-3.png",
-            "link": "/pages/contact",
-            "alt": "Advertise here \u2014 this ad slot is available"
+            "image": "",
+            "link": "",
+            "alt": ""
           }
         },
         "s4": {
           "type": "slot",
           "settings": {
-            "image": "shopify://shop_images/advertise-here-4.png",
-            "link": "/pages/contact",
-            "alt": "Advertise here \u2014 this ad slot is available"
+            "image": "",
+            "link": "",
+            "alt": ""
           }
         },
         "s5": {
           "type": "slot",
           "settings": {
-            "image": "shopify://shop_images/advertise-here-5.png",
-            "link": "/pages/contact",
-            "alt": "Advertise here \u2014 this ad slot is available"
+            "image": "",
+            "link": "",
+            "alt": ""
           }
         }
       },
@@ -229,7 +229,9 @@
         "direction": "left",
         "bg_color": "",
         "border_color": "",
-        "stripe_color": ""
+        "stripe_color": "",
+        "fallback_collection": "demo-buyflorabella",
+        "empty_label": "Advertise here"
       }
     },
     "birdlabs_callback": {
