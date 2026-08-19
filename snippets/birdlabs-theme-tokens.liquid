@@ -1,80 +1,64 @@
 {% comment %}
   snippets/birdlabs-theme-tokens.liquid
 
-  The Birdlabs palette system — two complete themes a shopper can switch between.
+  Binds the Birdlabs palette to SHOPIFY'S NATIVE COLOUR PALETTE.
 
-  WHY THIS EXISTS. Shopify's colour system is merchant-facing only: the merchant picks a
-  palette and every visitor gets it. There is no visitor-switchable dark mode, because
-  Horizon computes its colour tokens once from `settings.color_palette` and stops there.
+  THE POINT OF THIS FILE, restated after a refactor:
 
-  HOW IT WORKS. Two layers, and both matter:
+  Light theme is now 100% Shopify-native. Every --bl-* token below is an ALIAS of a variable
+  Horizon already computes from `settings.color_palette` — the standard palette any merchant
+  edits under Theme settings -> Colors. Nothing here invents a colour for the light theme, so
+  changing the palette in the Shopify UI changes every Birdlabs section with it. There is no
+  parallel light palette to keep in sync, because there is no parallel light palette.
 
-  1. **Horizon's own tokens are re-declared** under [data-birdlabs-theme='dark'], so stock
-     Horizon sections follow the switch without editing a single Shopify file.
+  Dark theme cannot work the same way, and this is a Shopify limitation rather than a
+  shortcut: **Shopify has no native dark palette.** `settings.color_palette` is a single set
+  of colours shipped to every visitor. So the dark theme is a small set of theme settings that
+  OVERRIDE Horizon's own --color-* variables. The --bl-* aliases below are unchanged, so every
+  section follows automatically — one indirection, not a second system.
 
-  2. **A `--bl-*` palette is published for the Birdlabs sections.** This is the part that was
-     missing: our sections previously wrote hard-coded hex from their own settings, so half
-     the page flipped and half did not — which is exactly what "the themes are quite off"
-     looked like. Now every Birdlabs section falls back to these tokens when its colour
-     setting is left blank, and only overrides when a merchant deliberately sets one.
-
-  THE TWO DEFAULT PALETTES, taken from the two real storefronts:
-
-    LIGHT  — FLTHQ. White and pale blue surfaces, deep navy text, light-blue accent bands.
-    DARK   — buyflorabella. Near-black purple ground (sampled: body rgb(10,10,10),
-             footer rgb(10,0,21)), light grey text, violet accent.
-
-  Every value is a theme setting, so a clone can re-skin both themes without touching code.
+  Net effect:
+    light  -> edit Theme settings -> Colors (native, 16-colour palette)
+    dark   -> edit Theme settings -> Birdlabs dark theme (8 settings, because Shopify has none)
 {% endcomment %}
 
 {%- liquid
-  # ── LIGHT (FLTHQ) ──
-  assign l_bg = settings.bl_light_bg | default: '#ffffff'
-  assign l_surface = settings.bl_light_surface | default: '#dceefb'
-  assign l_fg = settings.bl_light_fg | default: '#0b2545'
-  assign l_muted = settings.bl_light_muted | default: '#5b7291'
-  assign l_border = settings.bl_light_border | default: '#c8dff0'
-  assign l_accent = settings.bl_light_accent | default: '#0b2545'
-  assign l_on_accent = settings.bl_light_on_accent | default: '#ffffff'
-  assign l_band = settings.bl_light_band | default: '#a8d5f2'
-
-  # ── DARK (buyflorabella) ──
-  assign d_bg = settings.bl_dark_bg | default: '#0a0015'
-  assign d_surface = settings.bl_dark_surface | default: '#1a1030'
-  assign d_fg = settings.bl_dark_fg | default: '#f2f2f5'
-  assign d_muted = settings.bl_dark_muted | default: '#a8a8b8'
-  assign d_border = settings.bl_dark_border | default: '#2f2447'
-  assign d_accent = settings.bl_dark_accent | default: '#a78bfa'
-  assign d_on_accent = settings.bl_dark_on_accent | default: '#12002a'
-  assign d_band = settings.bl_dark_band | default: '#1a1030'
+  # Dark overrides. Defaults are a purple / yellow / pink scheme rather than purple-on-black.
+  assign d_bg = settings.bl_dark_bg | default: '#1a0b2e'
+  assign d_surface = settings.bl_dark_surface | default: '#2a1546'
+  assign d_fg = settings.bl_dark_fg | default: '#f7edff'
+  assign d_muted = settings.bl_dark_muted | default: '#bda6d6'
+  assign d_border = settings.bl_dark_border | default: '#3f2766'
+  assign d_accent = settings.bl_dark_accent | default: '#ffd93d'
+  assign d_on_accent = settings.bl_dark_on_accent | default: '#2a1546'
+  assign d_accent_2 = settings.bl_dark_accent_2 | default: '#ff5fa2'
 -%}
 
 <style>
+  /*
+   * LIGHT — pure aliases. Every value traces back to settings.color_palette via Horizon's
+   * own snippets/color-palette.liquid. Edit the palette in Shopify and this follows.
+   */
   :root {
-    --bl-bg: {{ l_bg }};
-    --bl-surface: {{ l_surface }};
-    --bl-fg: {{ l_fg }};
-    --bl-muted: {{ l_muted }};
-    --bl-border: {{ l_border }};
-    --bl-accent: {{ l_accent }};
-    --bl-on-accent: {{ l_on_accent }};
-    --bl-band: {{ l_band }};
-    /* Kept in sync so older rules referencing the accent keep working. */
-    --birdlabs-accent: {{ l_accent }};
+    --bl-bg: var(--color-background);
+    --bl-fg: var(--color-foreground);
+    --bl-muted: var(--color-foreground-muted);
+    --bl-border: var(--color-border);
+    --bl-accent: var(--color-primary-button-background);
+    --bl-on-accent: var(--color-primary-button-text);
+    --bl-accent-2: var(--color-primary-button-background);
+    /* No native "surface" token exists, so derive one from the two that do rather than
+       inventing a colour that the palette cannot reach. */
+    --bl-surface: color-mix(in srgb, var(--color-foreground) 5%, var(--color-background));
+    --bl-band: color-mix(in srgb, var(--color-foreground) 8%, var(--color-background));
+    --birdlabs-accent: var(--bl-accent);
   }
 
+  /*
+   * DARK — overrides Horizon's own tokens, so both stock Horizon sections and the --bl-*
+   * aliases above follow without either knowing about the other.
+   */
   [data-birdlabs-theme='dark'] {
-    --bl-bg: {{ d_bg }};
-    --bl-surface: {{ d_surface }};
-    --bl-fg: {{ d_fg }};
-    --bl-muted: {{ d_muted }};
-    --bl-border: {{ d_border }};
-    --bl-accent: {{ d_accent }};
-    --bl-on-accent: {{ d_on_accent }};
-    --bl-band: {{ d_band }};
-    --birdlabs-accent: {{ d_accent }};
-
-    /* Horizon's own tokens, so stock sections follow the switch too. */
     --color-background: {{ d_bg }};
     --color-background-rgb: {{ d_bg.rgb }};
     --color-foreground: {{ d_fg }};
@@ -87,12 +71,19 @@
     --color-input-border: {{ d_border }};
     --color-input-text: {{ d_fg }};
     --color-input-text-rgb: {{ d_fg.rgb }};
+    --color-primary-button-background: {{ d_accent }};
+    --color-primary-button-text: {{ d_on_accent }};
+    --color-primary-button-border: {{ d_accent }};
+
+    --bl-surface: {{ d_surface }};
+    --bl-band: {{ d_surface }};
+    --bl-accent-2: {{ d_accent_2 }};
     color-scheme: dark;
   }
 
-  /* Product photography is shot on light backgrounds; a slight knock-down stops it glaring
-     against a dark page without washing the colour out. SVG logos are left alone. */
-  [data-birdlabs-theme='dark'] img:not([src$='.svg']) { filter: brightness(0.92); }
+  /* Product photography is shot on light backgrounds; a small knock-down stops it glaring
+     against a dark page. SVG logos are left alone. */
+  [data-birdlabs-theme='dark'] img:not([src$='.svg']) { filter: brightness(0.94); }
 
   .birdlabs-theme-toggle {
     display: inline-flex;
@@ -108,7 +99,7 @@
     cursor: pointer;
   }
 
-  .birdlabs-theme-toggle:hover { background: rgb(127 127 127 / 18%); }
+  .birdlabs-theme-toggle:hover { background: color-mix(in srgb, currentColor 14%, transparent); }
   .birdlabs-theme-toggle svg { width: 18px; height: 18px; }
   .birdlabs-theme-toggle__moon { display: none; }
   [data-birdlabs-theme='dark'] .birdlabs-theme-toggle__sun { display: none; }
@@ -117,10 +108,10 @@
 
 <script>
   /*
-   * Runs before first paint, so a returning visitor never sees the wrong theme flash.
+   * Runs before first paint so a returning visitor never sees the wrong theme flash.
    * Storage: localStorage key "birdlabs-theme", value "light" or "dark".
-   * With nothing stored we follow the OS via prefers-color-scheme, and keep following it
-   * until the visitor makes an explicit choice.
+   * Light is the default. With nothing stored we follow prefers-color-scheme, and keep
+   * following it until the visitor chooses for themselves.
    */
   (function () {
     try {

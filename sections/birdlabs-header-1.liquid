@@ -30,13 +30,15 @@
       assign fg = blank
       assign muted = blank
     when 'light'
-      assign bg = '#ffffff'
-      assign fg = '#0b2545'
-      assign muted = '#64748b'
+      # Force-light/force-dark read the palette rather than baking brand hexes, so a
+      # merchant editing Theme settings -> Colors still reaches them.
+      assign bg = 'var(--color-background)'
+      assign fg = 'var(--color-foreground)'
+      assign muted = 'var(--color-foreground-muted)'
     when 'dark'
-      assign bg = '#111318'
-      assign fg = '#ffffff'
-      assign muted = '#a3adbb'
+      assign bg = settings.bl_dark_bg | default: '#1a0b2e'
+      assign fg = settings.bl_dark_fg | default: '#f7edff'
+      assign muted = settings.bl_dark_muted | default: '#bda6d6'
     else
       assign bg = section.settings.custom_bg
       assign fg = section.settings.custom_fg
