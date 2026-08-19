@@ -1,0 +1,19 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Shopify themes reject non-standard top-level directories.
+# Anything here that is not a Shopify theme folder MUST be ignored, or the
+# GitHub integration's sync to the store can fail. See .claude/CLAUDE.md.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Claude workflow docs — local only, never synced to Shopify
+.claude/
+claude_docs/
+
+# Local tooling and deploy scripts — local only, never synced to Shopify
+script/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
