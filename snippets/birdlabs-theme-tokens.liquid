@@ -145,6 +145,39 @@
       radial-gradient(55% 50% at 88% 92%, color-mix(in srgb, var(--bl-fg) 4%, transparent), transparent 70%);
   }
 
+  /*
+   * ── Scroll reveal ─────────────────────────────────────────────────────────────────
+   *
+   * Lives here, not in a section, because FIVE sections use `.birdlabs-reveal` while only
+   * one used to define it. Shopify aggregates every section stylesheet theme-wide, so that
+   * worked — right up until someone deleted the section that happened to own the rules, at
+   * which point four unrelated sections would have gone blank with nothing to point at.
+   *
+   * `.birdlabs-js` is added by assets/birdlabs-reveal.js the moment it executes, so the
+   * hidden state only ever applies when something is present to undo it. Without JS the
+   * content simply shows: a missing animation, not a silent content outage.
+   */
+  .birdlabs-js .birdlabs-reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition:
+      opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .birdlabs-reveal.is-in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .birdlabs-js .birdlabs-reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+
   .birdlabs-theme-toggle {
     display: inline-flex;
     align-items: center;
