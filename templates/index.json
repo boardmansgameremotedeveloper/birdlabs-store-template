@@ -101,7 +101,7 @@
         "anchor_id": "story",
         "mission_text": "A pull-quote that sums up why the store exists.",
         "cta_label": "Read more",
-        "cta_url": "#contact"
+        "cta_url": "/pages/our-story"
       }
     },
     "birdlabs_contact_demo": {
