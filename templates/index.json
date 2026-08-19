@@ -113,9 +113,18 @@
             "label": "Phone",
             "value": "+1 555 0100"
           }
+        },
+        "t1": {
+          "type": "trust",
+          "settings": {
+            "badge_text": "AUTH NET",
+            "name": "Secure payments by Authorize.net",
+            "detail": "All transactions encrypted with 128-bit SSL. Visa and Mastercard accepted."
+          }
         }
       },
       "block_order": [
+        "t1",
         "c1",
         "c2",
         "c3"
@@ -125,11 +134,65 @@
         "heading": "Get in touch",
         "anchor_id": "contact"
       }
+    },
+    "birdlabs_reels_demo": {
+      "type": "birdlabs-video-reels",
+      "blocks": {
+        "r1": {
+          "type": "reel",
+          "settings": {
+            "title": "How To Mix Flora Bella",
+            "video_id": "-SFmEtrPzd0",
+            "platform": "YouTube"
+          }
+        },
+        "r2": {
+          "type": "reel",
+          "settings": {
+            "title": "Compost Tea Mix",
+            "video_id": "3L2qpacas2s",
+            "platform": "YouTube"
+          }
+        },
+        "r3": {
+          "type": "reel",
+          "settings": {
+            "title": "Trace Minerals",
+            "video_id": "ZjHmtGw0ZqA",
+            "platform": "YouTube"
+          }
+        },
+        "r4": {
+          "type": "reel",
+          "settings": {
+            "title": "Waterfall Scene",
+            "video_id": "MdAHWVib7Kk",
+            "platform": "YouTube"
+          }
+        }
+      },
+      "block_order": [
+        "r1",
+        "r2",
+        "r3",
+        "r4"
+      ],
+      "settings": {
+        "eyebrow": "Watch",
+        "heading": "See it in action",
+        "anchor_id": "videos",
+        "privacy_mode": true,
+        "bg_color": "#fafafa",
+        "show_glow": true,
+        "glow_color_1": "#ff1493",
+        "glow_color_2": "#d4ff00"
+      }
     }
   },
   "order": [
     "birdlabs_hero2_demo",
     "birdlabs_products_demo",
+    "birdlabs_reels_demo",
     "birdlabs_story_demo",
     "birdlabs_contact_demo"
   ]

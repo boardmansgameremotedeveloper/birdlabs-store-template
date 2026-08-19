@@ -128,23 +128,7 @@
       });
     });
 
-    /* ── Scroll reveal ──────────────────────────────────────────────────── */
-    var reveals = root.querySelectorAll('.birdlabs-reveal');
-    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    if (reduce || !('IntersectionObserver' in window)) {
-      reveals.forEach(function (el) { el.classList.add('is-in-view'); });
-    } else {
-      var obs = new IntersectionObserver(function (entries) {
-        entries.forEach(function (e) {
-          if (e.isIntersecting) {
-            e.target.classList.add('is-in-view');
-            obs.unobserve(e.target);
-          }
-        });
-      }, { threshold: 0.12 });
-      reveals.forEach(function (el) { obs.observe(el); });
-    }
+    /* Scroll reveal is handled globally by assets/birdlabs-reveal.js. */
 
     /* ── Add to cart ────────────────────────────────────────────────────────
        Posts to /cart/add.js so the page never navigates, then tells Horizon's
@@ -188,6 +172,7 @@
 </script>
 
 <script src="{{ 'birdlabs-anchor-scroll.js' | asset_url }}" defer></script>
+<script src="{{ 'birdlabs-reveal.js' | asset_url }}" defer></script>
 
 {% stylesheet %}
   .birdlabs-products {

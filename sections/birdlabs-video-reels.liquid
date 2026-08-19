@@ -1,0 +1,480 @@
+{% comment %}
+  sections/birdlabs-video-reels.liquid
+
+  Birdlabs Video Reels — a 9:16 vertical player with a thumbnail picker beside it.
+  Ported from buyflorabella's app/componentsMockup2/components/VideoReelsIframe.tsx.
+
+  Deliberate changes from the source:
+  - The four videos were a hard-coded `reels` array. Here each video is a BLOCK, so a
+    merchant adds and reorders them in the editor.
+  - **Click-to-load facade.** The source mounts a YouTube <iframe> for the selected reel;
+    here nothing from YouTube loads until the visitor clicks play. YouTube embeds pull
+    several hundred KB and set cookies on load, so a page with a reel section otherwise
+    pays that cost for every visitor who never watches. The thumbnail is the poster.
+  - youtube-nocookie.com by default (merchant can switch it off), so no tracking cookie
+    is set unless the visitor actually plays a video.
+  - Accepts a bare YouTube ID, a watch URL, a youtu.be link or a full embed URL, because
+    a merchant pasting from the address bar is the normal case.
+{% endcomment %}
+
+{%- liquid
+  assign anchor = section.settings.anchor_id | strip | handleize
+  if anchor == blank
+    assign anchor = 'birdlabs-reels-' | append: section.id
+  endif
+
+  assign yt_host = 'https://www.youtube-nocookie.com/embed/'
+  unless section.settings.privacy_mode
+    assign yt_host = 'https://www.youtube.com/embed/'
+  endunless
+-%}
+
+<section
+  id="{{ anchor }}"
+  class="birdlabs-reels"
+  data-section-id="{{ section.id }}"
+  style="background: {{ section.settings.bg_color }};"
+>
+  {%- if section.settings.show_glow -%}
+    <div class="birdlabs-reels__glow" aria-hidden="true">
+      <span class="birdlabs-reels__glow-a" style="background: {{ section.settings.glow_color_1 }};"></span>
+      <span class="birdlabs-reels__glow-b" style="background: {{ section.settings.glow_color_2 }};"></span>
+    </div>
+  {%- endif -%}
+
+  <div class="birdlabs-reels__inner">
+    {%- if section.settings.eyebrow != blank or section.settings.heading != blank -%}
+      <div class="birdlabs-reels__head">
+        {%- if section.settings.eyebrow != blank -%}
+          <div class="birdlabs-reels__eyebrow">{{ section.settings.eyebrow | escape }}</div>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <h2 class="birdlabs-reels__heading">{{ section.settings.heading | escape }}</h2>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if section.blocks.size > 0 -%}
+      <div class="birdlabs-reels__layout">
+        <div class="birdlabs-reels__player">
+          <div class="birdlabs-reels__stage" data-stage>
+            {%- for block in section.blocks -%}
+              {%- liquid
+                assign vid = block.settings.video_id | strip
+                # Accept a watch URL, a youtu.be link, an embed URL or a bare id.
+                if vid contains 'v='
+                  assign vid = vid | split: 'v=' | last | split: '&' | first
+                elsif vid contains 'youtu.be/'
+                  assign vid = vid | split: 'youtu.be/' | last | split: '?' | first
+                elsif vid contains '/embed/'
+                  assign vid = vid | split: '/embed/' | last | split: '?' | first
+                endif
+              -%}
+              <div
+                class="birdlabs-reels__slide{% if forloop.first %} is-active{% endif %}"
+                data-slide="{{ forloop.index0 }}"
+                data-embed="{{ yt_host }}{{ vid | escape }}?autoplay=1&rel=0"
+                {{ block.shopify_attributes }}
+              >
+                {%- if block.settings.thumbnail != blank -%}
+                  {{
+                    block.settings.thumbnail
+                    | image_url: width: 720
+                    | image_tag:
+                      class: 'birdlabs-reels__poster',
+                      loading: 'lazy',
+                      alt: block.settings.title
+                  }}
+                {%- else -%}
+                  {%- comment -%}
+                    YouTube's hqdefault thumbnail is always 480x360.
+                    RemoteAsset is disabled deliberately: this is the fallback for when a
+                    merchant has not uploaded their own thumbnail, and it must come from
+                    YouTube. Uploading a thumbnail on the block avoids the remote fetch.
+                  {%- endcomment -%}
+                  <img
+                    class="birdlabs-reels__poster"
+                    src="https://i.ytimg.com/vi/{{ vid | escape }}/hqdefault.jpg"
+                    alt="{{ block.settings.title | escape }}"
+                    width="480"
+                    height="360"
+                    loading="lazy"
+                  >
+                {%- endif -%}
+
+                <button class="birdlabs-reels__play" type="button" data-play>
+                  <span class="visually-hidden">
+                    Play {{ block.settings.title | escape | default: 'video' }}
+                  </span>
+                  <svg viewBox="0 0 68 48" width="68" height="48" aria-hidden="true" focusable="false">
+                    <path class="birdlabs-reels__play-bg" d="M66.5 7.7a8.6 8.6 0 0 0-6-6C55.8 0 34 0 34 0S12.2 0 7.5 1.7a8.6 8.6 0 0 0-6 6A89.6 89.6 0 0 0 0 24a89.6 89.6 0 0 0 1.5 16.3 8.6 8.6 0 0 0 6 6C12.2 48 34 48 34 48s21.8 0 26.5-1.7a8.6 8.6 0 0 0 6-6A89.6 89.6 0 0 0 68 24a89.6 89.6 0 0 0-1.5-16.3z"/>
+                    <path d="M45 24 27 14v20z" fill="#fff"/>
+                  </svg>
+                </button>
+
+                {%- if block.settings.platform != blank -%}
+                  <span class="birdlabs-reels__platform">{{ block.settings.platform | escape }}</span>
+                {%- endif -%}
+              </div>
+            {%- endfor -%}
+          </div>
+        </div>
+
+        <div class="birdlabs-reels__picker" role="tablist" aria-label="Choose a video">
+          {%- for block in section.blocks -%}
+            {%- liquid
+              assign tvid = block.settings.video_id | strip
+              if tvid contains 'v='
+                assign tvid = tvid | split: 'v=' | last | split: '&' | first
+              elsif tvid contains 'youtu.be/'
+                assign tvid = tvid | split: 'youtu.be/' | last | split: '?' | first
+              elsif tvid contains '/embed/'
+                assign tvid = tvid | split: '/embed/' | last | split: '?' | first
+              endif
+            -%}
+            <button
+              class="birdlabs-reels__thumb{% if forloop.first %} is-active{% endif %}"
+              type="button"
+              role="tab"
+              aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+              data-select="{{ forloop.index0 }}"
+            >
+              {%- if block.settings.thumbnail != blank -%}
+                {{
+                  block.settings.thumbnail
+                  | image_url: width: 240
+                  | image_tag: class: 'birdlabs-reels__thumb-img', loading: 'lazy', alt: ''
+                }}
+              {%- elsif tvid != blank -%}
+                <img
+                  class="birdlabs-reels__thumb-img"
+                  src="https://i.ytimg.com/vi/{{ tvid | escape }}/mqdefault.jpg"
+                  alt=""
+                  width="320"
+                  height="180"
+                  loading="lazy"
+                >
+              {%- endif -%}
+              <span class="birdlabs-reels__thumb-meta">
+                <span class="birdlabs-reels__thumb-title">{{ block.settings.title | escape }}</span>
+                {%- if block.settings.platform != blank -%}
+                  <span class="birdlabs-reels__thumb-platform">{{ block.settings.platform | escape }}</span>
+                {%- endif -%}
+              </span>
+            </button>
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+<script>
+  (function () {
+    var root = document.querySelector('[data-section-id="{{ section.id }}"].birdlabs-reels');
+    if (!root) return;
+
+    var slides = root.querySelectorAll('.birdlabs-reels__slide');
+    var thumbs = root.querySelectorAll('.birdlabs-reels__thumb');
+
+    function show(index) {
+      slides.forEach(function (s) {
+        var on = s.dataset.slide === String(index);
+        s.classList.toggle('is-active', on);
+        // Leaving a slide tears its iframe down, so audio cannot keep playing
+        // from a reel the visitor has navigated away from.
+        if (!on) {
+          var frame = s.querySelector('iframe');
+          if (frame) frame.remove();
+          s.classList.remove('is-playing');
+        }
+      });
+      thumbs.forEach(function (t) {
+        var on = t.dataset.select === String(index);
+        t.classList.toggle('is-active', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+    }
+
+    thumbs.forEach(function (t) {
+      t.addEventListener('click', function () { show(t.dataset.select); });
+    });
+
+    root.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-play]');
+      if (!btn) return;
+
+      var slide = btn.closest('.birdlabs-reels__slide');
+      if (!slide || slide.querySelector('iframe')) return;
+
+      var frame = document.createElement('iframe');
+      frame.src = slide.dataset.embed;
+      frame.title = btn.textContent.trim();
+      frame.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      frame.allowFullscreen = true;
+      frame.loading = 'lazy';
+      frame.className = 'birdlabs-reels__iframe';
+      slide.appendChild(frame);
+      slide.classList.add('is-playing');
+    });
+  })();
+</script>
+
+<script src="{{ 'birdlabs-reveal.js' | asset_url }}" defer></script>
+
+{% stylesheet %}
+  .birdlabs-reels {
+    position: relative;
+    overflow: hidden;
+    padding: 80px 24px;
+  }
+
+  .birdlabs-reels__glow {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .birdlabs-reels__glow-a,
+  .birdlabs-reels__glow-b {
+    position: absolute;
+    width: 24rem;
+    height: 24rem;
+    border-radius: 50%;
+    filter: blur(64px);
+    opacity: 0.1;
+  }
+
+  .birdlabs-reels__glow-a { top: 0; left: 25%; }
+  .birdlabs-reels__glow-b { right: 25%; bottom: 0; }
+
+  .birdlabs-reels__inner {
+    position: relative;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  .birdlabs-reels__head {
+    margin-bottom: 48px;
+    text-align: center;
+  }
+
+  .birdlabs-reels__eyebrow {
+    margin-bottom: 10px;
+    font-family: var(--font-body--family);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+
+  .birdlabs-reels__heading {
+    margin: 0;
+    font-family: var(--font-heading--family);
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.1;
+  }
+
+  .birdlabs-reels__layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+
+  @media screen and (min-width: 990px) {
+    .birdlabs-reels__layout { grid-template-columns: 1fr 1fr; }
+  }
+
+  .birdlabs-reels__stage {
+    position: relative;
+    aspect-ratio: 9 / 16;
+    max-width: 28rem;
+    margin: 0 auto;
+    overflow: hidden;
+    border: 1px solid rgb(0 0 0 / 10%);
+    border-radius: 24px;
+    background: #000;
+    box-shadow: 0 25px 50px rgb(0 0 0 / 25%);
+  }
+
+  .birdlabs-reels__slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+  }
+
+  .birdlabs-reels__slide.is-active { display: block; }
+
+  .birdlabs-reels__poster {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .birdlabs-reels__iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .birdlabs-reels__play {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    border: 0;
+    background: rgb(0 0 0 / 15%);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .birdlabs-reels__play:hover { background: rgb(0 0 0 / 30%); }
+  .birdlabs-reels__slide.is-playing .birdlabs-reels__play { display: none; }
+
+  .birdlabs-reels__play-bg {
+    fill: #212121;
+    fill-opacity: 0.8;
+  }
+
+  .birdlabs-reels__play:hover .birdlabs-reels__play-bg {
+    fill: #f00;
+    fill-opacity: 1;
+  }
+
+  .birdlabs-reels__platform {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 2;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: rgb(0 0 0 / 70%);
+    color: #fff;
+    font-family: var(--font-body--family);
+    font-size: 0.6875rem;
+  }
+
+  .birdlabs-reels__picker {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+  }
+
+  .birdlabs-reels__thumb {
+    padding: 0;
+    overflow: hidden;
+    border: 2px solid transparent;
+    border-radius: 14px;
+    background: rgb(0 0 0 / 4%);
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .birdlabs-reels__thumb:hover { transform: translateY(-2px); }
+  .birdlabs-reels__thumb.is-active { border-color: var(--birdlabs-accent, #0b2545); }
+
+  .birdlabs-reels__thumb-img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+
+  .birdlabs-reels__thumb-meta {
+    display: block;
+    padding: 10px 12px;
+  }
+
+  .birdlabs-reels__thumb-title {
+    display: block;
+    font-family: var(--font-body--family);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .birdlabs-reels__thumb-platform {
+    display: block;
+    margin-top: 2px;
+    font-family: var(--font-body--family);
+    font-size: 0.6875rem;
+    opacity: 0.55;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .birdlabs-reels__thumb { transition: none; }
+    .birdlabs-reels__thumb:hover { transform: none; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Birdlabs Video Reels",
+  "tag": "section",
+  "class": "birdlabs-reels-wrapper",
+  "max_blocks": 12,
+  "blocks": [
+    {
+      "type": "reel",
+      "name": "Video",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Video title" },
+        {
+          "type": "text",
+          "id": "video_id",
+          "label": "YouTube video",
+          "info": "Paste the video URL or just its ID — a watch link, a youtu.be link and an embed URL all work."
+        },
+        {
+          "type": "image_picker",
+          "id": "thumbnail",
+          "label": "Thumbnail",
+          "info": "Optional. Falls back to YouTube's own thumbnail for the video."
+        },
+        { "type": "text", "id": "platform", "label": "Platform label", "default": "YouTube" }
+      ]
+    }
+  ],
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow text", "default": "Watch" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "See it in action" },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "info": "For one-page navigation — \"videos\" makes this reachable at /#videos.",
+      "default": "videos"
+    },
+    {
+      "type": "checkbox",
+      "id": "privacy_mode",
+      "label": "Use youtube-nocookie.com",
+      "info": "Recommended. No YouTube cookie is set unless a visitor actually plays a video.",
+      "default": true
+    },
+    { "type": "header", "content": "Background" },
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#fafafa" },
+    { "type": "checkbox", "id": "show_glow", "label": "Show soft colour glows", "default": true },
+    { "type": "color", "id": "glow_color_1", "label": "Glow 1", "default": "#ff1493" },
+    { "type": "color", "id": "glow_color_2", "label": "Glow 2", "default": "#d4ff00" }
+  ],
+  "presets": [
+    {
+      "name": "Birdlabs Video Reels",
+      "blocks": [
+        { "type": "reel", "settings": { "title": "First video", "platform": "YouTube" } },
+        { "type": "reel", "settings": { "title": "Second video", "platform": "YouTube" } },
+        { "type": "reel", "settings": { "title": "Third video", "platform": "YouTube" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

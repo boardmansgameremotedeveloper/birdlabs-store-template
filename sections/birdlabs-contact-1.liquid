@@ -44,6 +44,7 @@
       {%- if section.blocks.size > 0 -%}
         <div class="birdlabs-contact__info-list">
           {%- for block in section.blocks -%}
+            {%- if block.type != 'info' -%}{%- continue -%}{%- endif -%}
             <div class="birdlabs-contact__info-row" {{ block.shopify_attributes }}>
               {%- if block.settings.icon != blank -%}
                 <div class="birdlabs-contact__info-icon" aria-hidden="true">
@@ -60,6 +61,32 @@
           {%- endfor -%}
         </div>
       {%- endif -%}
+
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'trust' -%}
+          <div class="birdlabs-contact__trust" {{ block.shopify_attributes }}>
+            <div class="birdlabs-contact__trust-badge">
+              {%- if block.settings.logo != blank -%}
+                {{
+                  block.settings.logo
+                  | image_url: width: 104
+                  | image_tag: class: 'birdlabs-contact__trust-logo', loading: 'lazy', alt: block.settings.name
+                }}
+              {%- else -%}
+                <span>{{ block.settings.badge_text | escape | newline_to_br }}</span>
+              {%- endif -%}
+            </div>
+            <div>
+              {%- if block.settings.name != blank -%}
+                <div class="birdlabs-contact__trust-name">{{ block.settings.name | escape }}</div>
+              {%- endif -%}
+              {%- if block.settings.detail != blank -%}
+                <div class="birdlabs-contact__trust-sub">{{ block.settings.detail | escape }}</div>
+              {%- endif -%}
+            </div>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
 
       {%- if section.settings.note != blank -%}
         <p class="birdlabs-contact__note">{{ section.settings.note | escape }}</p>
@@ -121,6 +148,7 @@
 </section>
 
 <script src="{{ 'birdlabs-anchor-scroll.js' | asset_url }}" defer></script>
+<script src="{{ 'birdlabs-reveal.js' | asset_url }}" defer></script>
 
 {% stylesheet %}
   .birdlabs-contact { padding: 120px 40px; }
@@ -182,6 +210,61 @@
     font-family: var(--font-body--family);
     font-size: 0.9375rem;
     line-height: 1.6;
+  }
+
+  /*
+   * Trust panel — the frosted-glass treatment from FLTHQ's contact section, kept
+   * faithfully (rgba white + backdrop blur, 16px radius, 52px gradient badge tile).
+   * The difference is that the provider is merchant-supplied rather than hard-coded.
+   */
+  .birdlabs-contact__trust {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 36px;
+    padding: 20px;
+    border: 1px solid rgb(0 0 0 / 8%);
+    border-radius: 16px;
+    background: rgb(255 255 255 / 60%);
+    backdrop-filter: blur(8px);
+  }
+
+  .birdlabs-contact__trust-badge {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    background: var(--birdlabs-accent, #0b2545);
+    color: #fff;
+    font-family: var(--font-body--family);
+    font-size: 0.625rem;
+    font-weight: 800;
+    line-height: 1.1;
+    text-align: center;
+  }
+
+  .birdlabs-contact__trust-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .birdlabs-contact__trust-name {
+    margin-bottom: 3px;
+    font-family: var(--font-body--family);
+    font-size: 0.8125rem;
+    font-weight: 700;
+  }
+
+  .birdlabs-contact__trust-sub {
+    font-family: var(--font-body--family);
+    font-size: 0.6875rem;
+    line-height: 1.5;
+    opacity: 0.6;
   }
 
   .birdlabs-contact__note {
@@ -262,6 +345,41 @@
   "class": "birdlabs-contact-wrapper",
   "max_blocks": 6,
   "blocks": [
+    {
+      "type": "trust",
+      "name": "Payment / trust panel",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "State your real payment provider here. Left blank in the template on purpose — every clone inherits these defaults, and a store must not claim a processor it does not use."
+        },
+        {
+          "type": "image_picker",
+          "id": "logo",
+          "label": "Provider logo",
+          "info": "Preferred. Falls back to the text tile below when empty."
+        },
+        {
+          "type": "text",
+          "id": "badge_text",
+          "label": "Badge text",
+          "info": "Used only when no logo is set. Short — it sits in a 52px tile."
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Headline",
+          "info": "e.g. \"Secure payments by Authorize.net\""
+        },
+        {
+          "type": "textarea",
+          "id": "detail",
+          "label": "Detail line",
+          "info": "e.g. \"All transactions encrypted with 128-bit SSL. Visa and Mastercard accepted.\""
+        }
+      ]
+    },
     {
       "type": "info",
       "name": "Contact detail",
