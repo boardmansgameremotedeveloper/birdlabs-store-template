@@ -85,6 +85,66 @@
      against a dark page. SVG logos are left alone. */
   [data-birdlabs-theme='dark'] img:not([src$='.svg']) { filter: brightness(0.94); }
 
+  /*
+   * ── Background textures ───────────────────────────────────────────────────────────
+   *
+   * buyflorabella gets its "light but not flat" feel from a very subtle off-white vertical
+   * gradient (linear-gradient(#fafaf9, #f0f0ee)) with a low-opacity pattern layered over it.
+   * Reproduced here in tokens rather than fixed greys, so the same classes work on the dark
+   * theme instead of only the light one.
+   *
+   * Deliberately CSS-only. A tiling noise PNG would be heavier, would need uploading to every
+   * clone's Files, and could not follow the palette.
+   *
+   * Usage: add .birdlabs-tex plus one variant to any section.
+   */
+  .birdlabs-tex {
+    position: relative;
+    /* The base wash: barely-there vertical shift, the same trick as gradient-offwhite. */
+    background-image: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--bl-fg) 1%, var(--bl-bg)),
+      color-mix(in srgb, var(--bl-fg) 4%, var(--bl-bg))
+    );
+  }
+
+  /* The pattern rides on a pseudo-element so it never fights a section's own background,
+     and pointer-events stay with the content underneath. */
+  .birdlabs-tex::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .birdlabs-tex > * { position: relative; z-index: 1; }
+
+  /* Fine diagonal weave — reads as paper stock at arm's length. */
+  .birdlabs-tex--weave::before {
+    background-image: repeating-linear-gradient(
+      45deg,
+      color-mix(in srgb, var(--bl-fg) 3%, transparent) 0 1px,
+      transparent 1px 7px
+    );
+  }
+
+  /* Sparse dot field — quieter than the weave, good behind media. */
+  .birdlabs-tex--dots::before {
+    background-image: radial-gradient(
+      color-mix(in srgb, var(--bl-fg) 7%, transparent) 1px,
+      transparent 1px
+    );
+    background-size: 18px 18px;
+  }
+
+  /* Soft corner vignettes: shape without the coloured "splotch" look of a tinted blur. */
+  .birdlabs-tex--soft::before {
+    background-image:
+      radial-gradient(60% 55% at 15% 10%, color-mix(in srgb, var(--bl-fg) 5%, transparent), transparent 70%),
+      radial-gradient(55% 50% at 88% 92%, color-mix(in srgb, var(--bl-fg) 4%, transparent), transparent 70%);
+  }
+
   .birdlabs-theme-toggle {
     display: inline-flex;
     align-items: center;
