@@ -359,9 +359,42 @@
         "padding-block-start": 48,
         "padding-block-end": 48
       }
+    },
+    "birdlabs_hero2_demo": {
+      "type": "birdlabs-custom-hero2",
+      "settings": {
+        "eyebrow": "Birdlabs Store Template",
+        "heading_line1": "One page,",
+        "heading_line2": "one store",
+        "subtext": "Ported from FLTHQ to Horizon 4.1.4. Everything on this page is a Birdlabs section.",
+        "pills": "Free shipping, Easy returns, Made to order",
+        "cta_primary_label": "Shop now",
+        "cta_primary_url": "#products",
+        "cta_secondary_label": "Our story",
+        "cta_secondary_url": "#story",
+        "anchor_id": "home",
+        "section_height": 100,
+        "show_bg_images": false,
+        "bg_color": "#dceefb",
+        "show_clouds": true,
+        "show_announcement": false
+      }
+    },
+    "birdlabs_products_demo": {
+      "type": "birdlabs-products-1",
+      "settings": {
+        "eyebrow": "The collection",
+        "title": "Our products",
+        "anchor_id": "products",
+        "show_filters": true,
+        "all_label": "All products",
+        "products_shown": 24
+      }
     }
   },
   "order": [
+    "birdlabs_hero2_demo",
+    "birdlabs_products_demo",
     "marquee_MY8TjJ",
     "birdlabs_custom_hero1_Px4Rke",
     "product_list_fa6P9H"

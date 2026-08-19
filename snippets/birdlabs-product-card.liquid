@@ -1,0 +1,89 @@
+{% comment %}
+  snippets/birdlabs-product-card.liquid
+
+  Product card for the Birdlabs one-page storefront.
+  Ported from FLTHQ's snippets/flt-product-card-1.liquid (Horizon 3.4.0).
+
+  Usage: {% render 'birdlabs-product-card', product: product %}
+
+  Optional metafields (all degrade silently when absent):
+    product.metafields.custom.badge.value    -> badge label ("Bestseller", "New")
+    product.metafields.custom.tagline.value  -> tagline under the description
+
+  Add to cart posts to /cart/add.js and never navigates — the point of a one-pager.
+  It then dispatches Shopify's standard `shopify:cart:lines-update` event, which
+  Horizon's stock cart drawer listens for at assets/cart-drawer.js:33. That is what
+  connects these cards to the stock drawer instead of shipping a second cart.
+{% endcomment %}
+
+{%- liquid
+  assign variant = product.selected_or_first_available_variant
+  assign badge = product.metafields.custom.badge.value
+  assign tagline = product.metafields.custom.tagline.value
+  assign collection_handles = product.collections | map: 'handle' | join: ' '
+-%}
+
+<div
+  class="birdlabs-product-card"
+  data-product-handle="{{ product.handle }}"
+  data-collections="{{ collection_handles }}"
+>
+  {%- if badge != blank -%}
+    <div class="birdlabs-product-card__badge">{{ badge | escape }}</div>
+  {%- endif -%}
+
+  <a class="birdlabs-product-card__image-wrap" href="{{ product.url }}" tabindex="-1" aria-hidden="true">
+    {%- if product.featured_image -%}
+      {{
+        product.featured_image
+        | image_url: width: 600
+        | image_tag:
+          class: 'birdlabs-product-card__img',
+          loading: 'lazy',
+          widths: '300, 450, 600',
+          sizes: '(min-width: 750px) 300px, 90vw',
+          alt: product.featured_image.alt | default: product.title
+      }}
+    {%- endif -%}
+  </a>
+
+  <div class="birdlabs-product-card__body">
+    <h3 class="birdlabs-product-card__name">
+      <a href="{{ product.url }}">{{ product.title | escape }}</a>
+    </h3>
+
+    {%- if product.description != blank -%}
+      <p class="birdlabs-product-card__desc">
+        {{- product.description | strip_html | truncate: 120 -}}
+      </p>
+    {%- endif -%}
+
+    {%- if tagline != blank -%}
+      <p class="birdlabs-product-card__tagline">{{ tagline | escape }}</p>
+    {%- endif -%}
+
+    <div class="birdlabs-product-card__footer">
+      <div class="birdlabs-product-card__price">
+        {%- if product.compare_at_price > product.price -%}
+          <s class="birdlabs-product-card__price-was">{{ product.compare_at_price | money }}</s>
+        {%- endif -%}
+        {{ product.price | money }}
+      </div>
+
+      {%- if variant and variant.available -%}
+        <button
+          class="birdlabs-product-card__btn"
+          type="button"
+          data-variant-id="{{ variant.id }}"
+          data-product-title="{{ product.title | escape }}"
+        >
+          {{ 'products.product.add_to_cart' | t }}
+        </button>
+      {%- else -%}
+        <button class="birdlabs-product-card__btn" type="button" disabled>
+          {{ 'products.product.sold_out' | t }}
+        </button>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
