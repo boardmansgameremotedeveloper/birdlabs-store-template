@@ -204,13 +204,78 @@
         "glow_color_1": "#ff1493",
         "glow_color_2": "#d4ff00"
       }
+    },
+    "birdlabs_admq": {
+      "type": "birdlabs-ad-marquee",
+      "blocks": {},
+      "block_order": [],
+      "settings": {
+        "total_slots": 5,
+        "slot_width": 300,
+        "slot_height": 100,
+        "gap": 12,
+        "scroll_speed": 18,
+        "direction": "left",
+        "show_lead_in": false,
+        "lead_in_width": 300,
+        "bg_color": "#12002a",
+        "border_color": "#2a1247",
+        "stripe_color": "#3a2a5c"
+      }
+    },
+    "birdlabs_callback": {
+      "type": "birdlabs-callback",
+      "blocks": {
+        "p1": {
+          "type": "point",
+          "settings": {
+            "icon": "\u23f1\ufe0f",
+            "text": "Usually a same-day call back"
+          }
+        },
+        "p2": {
+          "type": "point",
+          "settings": {
+            "icon": "\ud83e\udde0",
+            "text": "Straight to someone who knows the products"
+          }
+        },
+        "p3": {
+          "type": "point",
+          "settings": {
+            "icon": "\ud83d\udeab",
+            "text": "No obligation, no hard sell"
+          }
+        }
+      },
+      "block_order": [
+        "p1",
+        "p2",
+        "p3"
+      ],
+      "settings": {
+        "eyebrow": "Talk to a human",
+        "heading": "Not sure where to start? We'll call you.",
+        "body": "Leave a number and one of our specialists will call you back \u2014 usually the same day. Ask anything: what to buy, how to use it, or whether it suits your setup.",
+        "button_label": "Request a callback",
+        "phone_placeholder": "(555) 123-4567",
+        "show_topic": true,
+        "topic_placeholder": "What would you like to talk through?",
+        "reassurance": "We use your number only to return this call.",
+        "anchor_id": "callback",
+        "bg_color": "#12002a",
+        "text_color": "#f2f4f7",
+        "accent_color": "#a78bfa"
+      }
     }
   },
   "order": [
+    "birdlabs_admq",
     "birdlabs_hero2_demo",
     "birdlabs_products_demo",
     "birdlabs_reels_demo",
     "birdlabs_story_demo",
-    "birdlabs_contact_demo"
+    "birdlabs_contact_demo",
+    "birdlabs_callback"
   ]
 }

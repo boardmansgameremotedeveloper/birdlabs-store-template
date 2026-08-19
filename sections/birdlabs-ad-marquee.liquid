@@ -53,6 +53,7 @@
     --admq-speed: {{ section.settings.scroll_speed }}s;
     --admq-bg: {{ section.settings.bg_color }};
     --admq-border: {{ section.settings.border_color }};
+    --admq-stripe: {{ section.settings.stripe_color }};
   "
 >
   <div class="birdlabs-admq__inner">
@@ -190,16 +191,21 @@
     background: rgb(0 0 0 / 4%);
   }
 
-  /* Unbooked slot: visible inventory, not a hole in the strip. */
+  /*
+   * Unbooked slot: visible inventory, not a hole in the strip.
+   * The stripes are drawn in the merchant's chosen stripe colour rather than flat black,
+   * because a black-on-dark placeholder is invisible — which defeats the entire point of
+   * showing unsold inventory. Default suits a dark bar; lighten it for a light one.
+   */
   .birdlabs-admq__slot--empty {
     background: repeating-linear-gradient(
       45deg,
-      rgb(0 0 0 / 12%),
-      rgb(0 0 0 / 12%) 10px,
-      rgb(0 0 0 / 6%) 10px,
-      rgb(0 0 0 / 6%) 20px
+      var(--admq-stripe, rgb(255 255 255 / 14%)),
+      var(--admq-stripe, rgb(255 255 255 / 14%)) 10px,
+      transparent 10px,
+      transparent 20px
     );
-    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 15%);
+    box-shadow: inset 0 0 0 1px var(--admq-stripe, rgb(255 255 255 / 14%));
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -285,7 +291,14 @@
     { "type": "range", "id": "lead_in_width", "label": "Lead-in width", "min": 120, "max": 600, "step": 10, "unit": "px", "default": 300 },
     { "type": "header", "content": "Appearance" },
     { "type": "color", "id": "bg_color", "label": "Background", "default": "#12002a" },
-    { "type": "color", "id": "border_color", "label": "Bottom border", "default": "#2a1247" }
+    { "type": "color", "id": "border_color", "label": "Bottom border", "default": "#2a1247" },
+    {
+      "type": "color",
+      "id": "stripe_color",
+      "label": "Empty slot stripes",
+      "info": "Must contrast with the background — a dark stripe on a dark bar is invisible.",
+      "default": "#3a2a5c"
+    }
   ],
   "presets": [
     {

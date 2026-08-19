@@ -174,10 +174,32 @@
     transition: background-color 0.4s ease, box-shadow 0.3s ease;
   }
 
-  .birdlabs-header--sticky {
+  /*
+   * Sticky has to be applied to the HEADER GROUP, not to this element.
+   *
+   * `position: sticky` only sticks within its own containing block, and Shopify wraps each
+   * section in its own element — a box exactly as tall as the header. Sticking to that box
+   * means the header scrolls away the instant the box does. Measured before the fix: the
+   * header's top went to -1957px after a 2000px scroll, i.e. it did not stick at all.
+   *
+   * Sticking #header-group works because that element spans the announcement bar and the
+   * header together and is a direct child of Horizon's real scroll container, .page-wrapper.
+   * :has() keeps this opt-in — it only applies when a sticky Birdlabs header is inside.
+   */
+  #header-group:has(.birdlabs-header--sticky) {
     position: sticky;
     top: 0;
-    z-index: 40;
+    z-index: 50;
+  }
+
+  /* Fallback for browsers without :has() — sticks this element, which is better than nothing
+     on the shorter pages where its wrapper stays in view. */
+  @supports not selector(:has(*)) {
+    .birdlabs-header--sticky {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
   }
 
   /* Transparent over a full-bleed hero, solid once scrolled past it. */

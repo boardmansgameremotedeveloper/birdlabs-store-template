@@ -1,0 +1,332 @@
+{% comment %}
+  sections/birdlabs-callback.liquid
+
+  "Talk to an expert" callback request band. Design and interaction concepts from
+  divorcemachine.com (frontend/src/pages/Home.jsx RequestCallButton + backend/api/voice.py).
+
+  WHAT COULD NOT BE PORTED, AND WHAT WAS DONE INSTEAD
+
+  divorcemachine places a real outbound Twilio call: the browser POSTs to
+  /api/voice/test-call, then polls /api/voice/test-call/{id} through calling -> verifying ->
+  ringing -> done|missed, rate limited to five per hour. **A Shopify theme has no backend**,
+  so none of that can be reproduced in Liquid. Rather than ship a button that lies:
+
+  - **Default (no configuration): Shopify's native contact form.** The request is emailed to
+    the store owner and lands in the admin. It genuinely works the moment the section is
+    added — no infrastructure, no app, no account.
+  - **Optional: `callback_endpoint`.** Point it at a real callback service — divorcemachine's
+    own, or anything that accepts `{name, phone, topic}` — and the JS switches to the async
+    path with the same progress states as the original, including the polling behaviour.
+
+  So the section is honest at both ends: it does something real out of the box, and it becomes
+  the real thing when a backend exists.
+
+  Copy defaults are written to be enticing without over-claiming: they promise a call back from
+  a person, which the contact-form path genuinely delivers.
+{% endcomment %}
+
+{%- liquid
+  assign anchor = section.settings.anchor_id | strip | handleize
+  if anchor == blank
+    assign anchor = 'birdlabs-callback-' | append: section.id
+  endif
+-%}
+
+<section
+  id="{{ anchor }}"
+  class="birdlabs-cb"
+  data-section-id="{{ section.id }}"
+  data-endpoint="{{ section.settings.callback_endpoint | escape }}"
+  style="
+    --cb-bg: {{ section.settings.bg_color }};
+    --cb-fg: {{ section.settings.text_color }};
+    --cb-accent: {{ section.settings.accent_color }};
+  "
+>
+  <div class="birdlabs-cb__inner">
+    <div class="birdlabs-cb__copy">
+      {%- if section.settings.eyebrow != blank -%}
+        <div class="birdlabs-cb__eyebrow">{{ section.settings.eyebrow | escape }}</div>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="birdlabs-cb__heading">{{ section.settings.heading | escape }}</h2>
+      {%- endif -%}
+      {%- if section.settings.body != blank -%}
+        <p class="birdlabs-cb__body">{{ section.settings.body | escape }}</p>
+      {%- endif -%}
+
+      {%- assign points = section.blocks | where: 'type', 'point' -%}
+      {%- if points.size > 0 -%}
+        <ul class="birdlabs-cb__points">
+          {%- for block in points -%}
+            <li class="birdlabs-cb__point" {{ block.shopify_attributes }}>
+              {%- if block.settings.icon != blank -%}
+                <span aria-hidden="true">{{ block.settings.icon | escape }}</span>
+              {%- endif -%}
+              {{ block.settings.text | escape }}
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+
+    <div class="birdlabs-cb__panel">
+      {%- form 'contact', class: 'birdlabs-cb__form' -%}
+        {%- if form.posted_successfully? -%}
+          <p class="birdlabs-cb__ok" role="status">
+            {{ 'blocks.contact_form.post_success' | t }}
+          </p>
+        {%- endif -%}
+        {%- if form.errors -%}
+          <p class="birdlabs-cb__err" role="alert">{{ form.errors | default_errors }}</p>
+        {%- endif -%}
+
+        <label class="birdlabs-cb__label" for="cbName-{{ section.id }}">Your name</label>
+        <input class="birdlabs-cb__input" id="cbName-{{ section.id }}" type="text"
+               name="contact[name]" autocomplete="name" required>
+
+        <label class="birdlabs-cb__label" for="cbPhone-{{ section.id }}">Phone number</label>
+        <input class="birdlabs-cb__input" id="cbPhone-{{ section.id }}" type="tel"
+               name="contact[phone]" autocomplete="tel" inputmode="tel"
+               placeholder="{{ section.settings.phone_placeholder | escape }}" required>
+
+        {%- if section.settings.show_topic -%}
+          <label class="birdlabs-cb__label" for="cbTopic-{{ section.id }}">What can we help with?</label>
+          <input class="birdlabs-cb__input" id="cbTopic-{{ section.id }}" type="text"
+                 name="contact[body]" placeholder="{{ section.settings.topic_placeholder | escape }}">
+        {%- else -%}
+          <input type="hidden" name="contact[body]" value="Callback requested">
+        {%- endif -%}
+
+        <button class="birdlabs-cb__submit" type="submit" data-cb-submit>
+          {{ section.settings.button_label | escape }}
+        </button>
+
+        <p class="birdlabs-cb__status" data-cb-status hidden></p>
+
+        {%- if section.settings.reassurance != blank -%}
+          <p class="birdlabs-cb__fine">{{ section.settings.reassurance | escape }}</p>
+        {%- endif -%}
+      {%- endform -%}
+    </div>
+  </div>
+</section>
+
+<script src="{{ 'birdlabs-callback.js' | asset_url }}" defer></script>
+
+{% stylesheet %}
+  .birdlabs-cb {
+    padding: 72px 24px;
+    background: var(--cb-bg, #12002a);
+    color: var(--cb-fg, #f2f4f7);
+  }
+
+  .birdlabs-cb__inner {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 48px;
+    align-items: center;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .birdlabs-cb__eyebrow {
+    margin-bottom: 10px;
+    color: var(--cb-accent, #a78bfa);
+    font-family: var(--font-body--family);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+
+  .birdlabs-cb__heading {
+    margin: 0 0 14px;
+    font-family: var(--font-heading--family);
+    font-size: clamp(1.875rem, 3.6vw, 2.75rem);
+    line-height: 1.1;
+  }
+
+  .birdlabs-cb__body {
+    margin: 0 0 20px;
+    font-family: var(--font-body--family);
+    font-size: 1rem;
+    line-height: 1.7;
+    opacity: 0.8;
+  }
+
+  .birdlabs-cb__points {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .birdlabs-cb__point {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-family: var(--font-body--family);
+    font-size: 0.9375rem;
+    opacity: 0.85;
+  }
+
+  .birdlabs-cb__panel {
+    padding: 28px;
+    border: 1px solid rgb(255 255 255 / 12%);
+    border-radius: 18px;
+    background: rgb(255 255 255 / 6%);
+    backdrop-filter: blur(8px);
+  }
+
+  .birdlabs-cb__label {
+    display: block;
+    margin-bottom: 6px;
+    font-family: var(--font-body--family);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+
+  /*
+   * Scoped to the panel and using the section's own tokens. Horizon's base input styles are
+   * more specific than a bare class here, and were rendering these white with a near-
+   * invisible placeholder on the dark panel.
+   */
+  .birdlabs-cb__panel .birdlabs-cb__input,
+  .birdlabs-cb__input {
+    width: 100%;
+    margin-bottom: 16px;
+    padding: 12px 14px;
+    border: 1px solid rgb(255 255 255 / 18%);
+    border-radius: 10px;
+    background: rgb(0 0 0 / 25%);
+    color: inherit;
+    font-family: var(--font-body--family);
+    font-size: 0.9375rem;
+  }
+
+  .birdlabs-cb__panel .birdlabs-cb__input { color: var(--cb-fg, #f2f4f7); background: rgb(0 0 0 / 35%); }
+  .birdlabs-cb__panel .birdlabs-cb__input::placeholder { color: var(--cb-fg, #f2f4f7); opacity: 0.45; }
+  .birdlabs-cb__panel .birdlabs-cb__input:focus {
+    outline: 2px solid var(--cb-accent, #a78bfa);
+    outline-offset: 1px;
+  }
+
+  .birdlabs-cb__submit {
+    width: 100%;
+    padding: 14px 24px;
+    border: 0;
+    border-radius: 40px;
+    background: var(--cb-accent, #a78bfa);
+    color: #12002a;
+    font-family: var(--font-heading--family);
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .birdlabs-cb__submit[disabled] { opacity: 0.6; cursor: progress; }
+
+  .birdlabs-cb__status {
+    margin: 12px 0 0;
+    font-family: var(--font-body--family);
+    font-size: 0.875rem;
+    text-align: center;
+  }
+
+  .birdlabs-cb__fine {
+    margin: 14px 0 0;
+    font-family: var(--font-body--family);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    text-align: center;
+    opacity: 0.55;
+  }
+
+  .birdlabs-cb__ok,
+  .birdlabs-cb__err {
+    margin: 0 0 16px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-family: var(--font-body--family);
+    font-size: 0.875rem;
+  }
+
+  .birdlabs-cb__ok { background: rgb(16 185 129 / 18%); }
+  .birdlabs-cb__err { background: rgb(239 68 68 / 18%); }
+
+  @media (max-width: 768px) {
+    .birdlabs-cb { padding: 56px 20px; }
+    .birdlabs-cb__inner { gap: 32px; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Birdlabs Callback",
+  "tag": "section",
+  "class": "birdlabs-cb-wrapper",
+  "max_blocks": 6,
+  "blocks": [
+    {
+      "type": "point",
+      "name": "Reassurance point",
+      "settings": [
+        { "type": "text", "id": "icon", "label": "Icon", "info": "An emoji. Optional." },
+        { "type": "text", "id": "text", "label": "Text", "default": "No obligation, no hard sell" }
+      ]
+    }
+  ],
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Talk to a human" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Not sure where to start? We'll call you." },
+    {
+      "type": "textarea",
+      "id": "body",
+      "label": "Body",
+      "default": "Leave a number and one of our specialists will call you back — usually the same day. Ask anything: what to buy, how to use it, or whether it suits your setup."
+    },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Request a callback" },
+    { "type": "text", "id": "phone_placeholder", "label": "Phone placeholder", "default": "(555) 123-4567" },
+    { "type": "checkbox", "id": "show_topic", "label": "Ask what it is about", "default": true },
+    { "type": "text", "id": "topic_placeholder", "label": "Topic placeholder", "default": "What would you like to talk through?" },
+    {
+      "type": "textarea",
+      "id": "reassurance",
+      "label": "Small print",
+      "default": "We use your number only to return this call."
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "info": "For one-page navigation — \"callback\" makes this reachable at /#callback.",
+      "default": "callback"
+    },
+    { "type": "header", "content": "Live callback service" },
+    {
+      "type": "paragraph",
+      "content": "Leave this blank and requests are emailed to you through Shopify's contact form — that works immediately with no setup. Enter an endpoint URL only if you run a real callback service (a Twilio backend, for example); the form then posts to it and shows live progress instead."
+    },
+    { "type": "url", "id": "callback_endpoint", "label": "Callback endpoint" },
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#12002a" },
+    { "type": "color", "id": "text_color", "label": "Text", "default": "#f2f4f7" },
+    { "type": "color", "id": "accent_color", "label": "Accent", "default": "#a78bfa" }
+  ],
+  "presets": [
+    {
+      "name": "Birdlabs Callback",
+      "blocks": [
+        { "type": "point", "settings": { "icon": "⏱️", "text": "Usually a same-day call back" } },
+        { "type": "point", "settings": { "icon": "🧠", "text": "Straight to someone who knows the products" } },
+        { "type": "point", "settings": { "icon": "🚫", "text": "No obligation, no hard sell" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
