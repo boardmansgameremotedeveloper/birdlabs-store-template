@@ -306,12 +306,217 @@
         "text_color": "",
         "accent_color": ""
       }
+    },
+    "birdlabs_promo": {
+      "type": "birdlabs-promo-strip",
+      "blocks": {
+        "a": {
+          "type": "promo",
+          "settings": {
+            "product": "bfb-aerator-plus",
+            "badge": "New",
+            "doc_url": "https://cdn.shopify.com/s/files/1/0755/4485/4597/files/FB-Direct_Ag_Solutions_Areator_Plus_Flyer_PROD.pdf",
+            "doc_label": "Spec sheet"
+          }
+        },
+        "y": {
+          "type": "promo",
+          "settings": {
+            "product": "bfb-yield-boost",
+            "badge": "New",
+            "doc_url": "https://cdn.shopify.com/s/files/1/0755/4485/4597/files/FB-YIELDBOOST_Brochure_PROD.pdf",
+            "doc_label": "Brochure"
+          }
+        }
+      },
+      "block_order": [
+        "a",
+        "y"
+      ],
+      "settings": {
+        "eyebrow": "New this month",
+        "button_label": "Add",
+        "columns": 2,
+        "bg_color": "",
+        "accent_color": ""
+      }
+    },
+    "birdlabs_scoop": {
+      "type": "birdlabs-scoop-analysis",
+      "blocks": {
+        "m0": {
+          "type": "mineral",
+          "settings": {
+            "symbol": "Mg",
+            "name": "Magnesium",
+            "number": "12",
+            "benefit": "Supports deep green foliage and energy production in leaves."
+          }
+        },
+        "m1": {
+          "type": "mineral",
+          "settings": {
+            "symbol": "Fe",
+            "name": "Iron",
+            "number": "26",
+            "benefit": "Essential for chlorophyll production and oxygen transport."
+          }
+        },
+        "m2": {
+          "type": "mineral",
+          "settings": {
+            "symbol": "Zn",
+            "name": "Zinc",
+            "number": "30",
+            "benefit": "Activates enzymes and regulates growth hormones."
+          }
+        },
+        "m3": {
+          "type": "mineral",
+          "settings": {
+            "symbol": "Cu",
+            "name": "Copper",
+            "number": "29",
+            "benefit": "Supports protein synthesis and strengthens cell walls."
+          }
+        },
+        "m4": {
+          "type": "mineral",
+          "settings": {
+            "symbol": "Mn",
+            "name": "Manganese",
+            "number": "25",
+            "benefit": "Helps chelate nutrients so roots can reach what the soil already holds."
+          }
+        },
+        "m5": {
+          "type": "mineral",
+          "settings": {
+            "symbol": "B",
+            "name": "Boron",
+            "number": "5",
+            "benefit": "Critical for cell division and fruit and seed development."
+          }
+        },
+        "a0": {
+          "type": "analysis",
+          "settings": {
+            "element": "Calcium",
+            "symbol": "Ca",
+            "percentage": "1.40%"
+          }
+        },
+        "a1": {
+          "type": "analysis",
+          "settings": {
+            "element": "Magnesium",
+            "symbol": "Mg",
+            "percentage": "1.40%"
+          }
+        },
+        "a2": {
+          "type": "analysis",
+          "settings": {
+            "element": "Sulfur",
+            "symbol": "S",
+            "percentage": "3.65%"
+          }
+        },
+        "a3": {
+          "type": "analysis",
+          "settings": {
+            "element": "Boron",
+            "symbol": "B",
+            "percentage": "0.02%"
+          }
+        },
+        "a4": {
+          "type": "analysis",
+          "settings": {
+            "element": "Cobalt",
+            "symbol": "Co",
+            "percentage": "0.0028%"
+          }
+        },
+        "a5": {
+          "type": "analysis",
+          "settings": {
+            "element": "Copper",
+            "symbol": "Cu",
+            "percentage": "0.25%"
+          }
+        },
+        "a6": {
+          "type": "analysis",
+          "settings": {
+            "element": "Iron",
+            "symbol": "Fe",
+            "percentage": "2.50%"
+          }
+        },
+        "a7": {
+          "type": "analysis",
+          "settings": {
+            "element": "Manganese",
+            "symbol": "Mn",
+            "percentage": "0.24%"
+          }
+        },
+        "a8": {
+          "type": "analysis",
+          "settings": {
+            "element": "Molybdenum",
+            "symbol": "Mo",
+            "percentage": "0.0005%"
+          }
+        },
+        "a9": {
+          "type": "analysis",
+          "settings": {
+            "element": "Zinc",
+            "symbol": "Zn",
+            "percentage": "0.48%"
+          }
+        }
+      },
+      "block_order": [
+        "m0",
+        "m1",
+        "m2",
+        "m3",
+        "m4",
+        "m5",
+        "a0",
+        "a1",
+        "a2",
+        "a3",
+        "a4",
+        "a5",
+        "a6",
+        "a7",
+        "a8",
+        "a9"
+      ],
+      "settings": {
+        "eyebrow": "70+ trace minerals",
+        "heading": "Inside every scoop",
+        "body": "A broad spectrum of naturally occurring trace minerals \u2014 the elements soil biology needs to unlock what your ground already holds.",
+        "ga_title": "Guaranteed analysis",
+        "ga_subtitle": "View mineral percentages",
+        "ga_open": false,
+        "ga_footnote": "Minimum percentages by weight \u00b7 Lab tested",
+        "anchor_id": "analysis",
+        "bg_color": "",
+        "accent_color": ""
+      }
     }
   },
   "order": [
     "birdlabs_admq",
+    "birdlabs_promo",
     "birdlabs_hero3",
     "birdlabs_products_demo",
+    "birdlabs_scoop",
     "birdlabs_reels_demo",
     "birdlabs_story_demo",
     "birdlabs_contact_demo",

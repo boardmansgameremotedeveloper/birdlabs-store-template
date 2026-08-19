@@ -1,0 +1,296 @@
+{% comment %}
+  sections/birdlabs-promo-strip.liquid
+
+  A deliberately SMALL featured-products strip — "these are promo today, but may not be
+  tomorrow".
+
+  WHY NOT SHOPIFY'S FEATURED COLLECTION / FEATURED PRODUCT SECTIONS: they are built to
+  showcase, so they give a product a large image and a lot of vertical space. That reads as
+  "this is what the store is", which is the opposite of a transient promo. The whole design
+  goal here is restraint:
+
+  - a horizontal card — small square thumbnail beside the text, not above it — so the row
+    costs a fraction of the height a stock featured section would
+  - the row sits inline near the top of the page rather than claiming a full band
+  - an optional badge ("New", "This month") carries the sense of impermanence, so the
+    urgency comes from a label rather than from size
+
+  It replaces what buyflorabella currently does at the top of its homepage: two bare text
+  links straight out to PDF brochures, which take the visitor off the site before they ever
+  see a price or an add-to-cart. Here each promo is a REAL product — image, price, add to
+  cart — with the brochure demoted to a secondary link beside it. Nothing is lost, and the
+  path to buying is no longer a dead end.
+
+  Colours follow the theme palette; leave a setting blank and it inherits light/dark.
+{% endcomment %}
+
+{%- liquid
+  assign promos = section.blocks | where: 'type', 'promo'
+-%}
+
+{%- if promos.size > 0 -%}
+  <section
+    class="birdlabs-promo"
+    data-section-id="{{ section.id }}"
+    style="
+      {%- if section.settings.bg_color != blank %}--pr-bg: {{ section.settings.bg_color }};{% endif -%}
+      {%- if section.settings.accent_color != blank %}--pr-accent: {{ section.settings.accent_color }};{% endif -%}
+      --pr-cols: {{ section.settings.columns }};
+    "
+  >
+    <div class="birdlabs-promo__inner">
+      {%- if section.settings.eyebrow != blank -%}
+        <div class="birdlabs-promo__eyebrow">{{ section.settings.eyebrow | escape }}</div>
+      {%- endif -%}
+
+      <div class="birdlabs-promo__row">
+        {%- for block in promos -%}
+          {%- liquid
+            assign product = block.settings.product
+            assign variant = product.selected_or_first_available_variant
+            assign title = block.settings.title_override | default: product.title
+          -%}
+          <div class="birdlabs-promo__card" {{ block.shopify_attributes }}>
+            {%- if product != blank and product.featured_image -%}
+              <a class="birdlabs-promo__thumb" href="{{ product.url }}" tabindex="-1" aria-hidden="true">
+                {{
+                  product.featured_image
+                  | image_url: width: 200
+                  | image_tag: class: 'birdlabs-promo__img', loading: 'lazy', alt: ''
+                }}
+              </a>
+            {%- endif -%}
+
+            <div class="birdlabs-promo__body">
+              {%- if block.settings.badge != blank -%}
+                <span class="birdlabs-promo__badge">{{ block.settings.badge | escape }}</span>
+              {%- endif -%}
+
+              <h3 class="birdlabs-promo__title">
+                {%- if product != blank -%}
+                  <a href="{{ product.url }}">{{ title | escape }}</a>
+                {%- else -%}
+                  {{ title | default: 'Choose a product' | escape }}
+                {%- endif -%}
+              </h3>
+
+              {%- if product != blank -%}
+                <div class="birdlabs-promo__price">{{ product.price | money }}</div>
+              {%- endif -%}
+
+              <div class="birdlabs-promo__actions">
+                {%- if product != blank and variant and variant.available -%}
+                  <button
+                    class="birdlabs-promo__btn"
+                    type="button"
+                    data-variant-id="{{ variant.id }}"
+                  >
+                    {{ section.settings.button_label | escape }}
+                  </button>
+                {%- endif -%}
+
+                {%- if block.settings.doc_url != blank -%}
+                  {%- comment -%}
+                    The brochure is deliberately secondary, and opens in a new tab so the
+                    PDF does not replace the store in the visitor's window.
+                  {%- endcomment -%}
+                  <a
+                    class="birdlabs-promo__doc"
+                    href="{{ block.settings.doc_url }}"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    {{ block.settings.doc_label | default: 'Brochure' | escape }}
+                    <span aria-hidden="true">↗</span>
+                    <span class="visually-hidden">(opens in a new tab)</span>
+                  </a>
+                {%- endif -%}
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  </section>
+
+  <script src="{{ 'birdlabs-promo-strip.js' | asset_url }}" defer></script>
+{%- endif -%}
+
+{% stylesheet %}
+  .birdlabs-promo {
+    padding: 18px 24px;
+    background: var(--pr-bg, var(--bl-surface));
+    color: var(--bl-fg);
+  }
+
+  .birdlabs-promo__inner {
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+
+  .birdlabs-promo__eyebrow {
+    margin-bottom: 10px;
+    color: var(--pr-accent, var(--bl-accent));
+    font-family: var(--font-body--family);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .birdlabs-promo__row {
+    display: grid;
+    grid-template-columns: repeat(var(--pr-cols, 2), minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  /* Horizontal card: the thumbnail sits BESIDE the text, which is what keeps this a strip
+     rather than a showcase. A stock featured section stacks them and triples the height. */
+  .birdlabs-promo__card {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid var(--bl-border);
+    border-radius: 12px;
+    background: var(--bl-bg);
+  }
+
+  .birdlabs-promo__thumb {
+    flex: 0 0 auto;
+    display: block;
+    width: 68px;
+    height: 68px;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--bl-surface);
+  }
+
+  .birdlabs-promo__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .birdlabs-promo__body {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .birdlabs-promo__badge {
+    display: inline-block;
+    margin-bottom: 3px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: var(--pr-accent, var(--bl-accent));
+    color: var(--bl-on-accent);
+    font-family: var(--font-body--family);
+    font-size: 0.5625rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .birdlabs-promo__title {
+    margin: 0 0 2px;
+    font-family: var(--font-heading--family);
+    font-size: 0.9375rem;
+    line-height: 1.25;
+    /* Two lines maximum: a long product name must not grow the strip. */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .birdlabs-promo__title a { color: inherit; text-decoration: none; }
+
+  .birdlabs-promo__price {
+    margin-bottom: 6px;
+    font-family: var(--font-body--family);
+    font-size: 0.8125rem;
+    opacity: 0.75;
+  }
+
+  .birdlabs-promo__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .birdlabs-promo__btn {
+    padding: 5px 14px;
+    border: 0;
+    border-radius: 20px;
+    background: var(--pr-accent, var(--bl-accent));
+    color: var(--bl-on-accent);
+    font-family: var(--font-body--family);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .birdlabs-promo__btn[disabled] { opacity: 0.5; cursor: default; }
+
+  .birdlabs-promo__doc {
+    color: inherit;
+    font-family: var(--font-body--family);
+    font-size: 0.6875rem;
+    text-decoration: underline;
+    opacity: 0.7;
+  }
+
+  .birdlabs-promo__doc:hover { opacity: 1; }
+
+  @media screen and (max-width: 749px) {
+    .birdlabs-promo__row { grid-template-columns: 1fr; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Birdlabs Promo Strip",
+  "tag": "section",
+  "class": "birdlabs-promo-wrapper",
+  "max_blocks": 4,
+  "blocks": [
+    {
+      "type": "promo",
+      "name": "Promo product",
+      "settings": [
+        { "type": "product", "id": "product", "label": "Product" },
+        { "type": "text", "id": "title_override", "label": "Title override", "info": "Optional. Defaults to the product title." },
+        { "type": "text", "id": "badge", "label": "Badge", "info": "Short — \"New\", \"This month\". Carries the sense that it is temporary." },
+        { "type": "url", "id": "doc_url", "label": "Brochure / spec sheet", "info": "Optional PDF. Opens in a new tab as a secondary link." },
+        { "type": "text", "id": "doc_label", "label": "Brochure link label", "default": "Brochure" }
+      ]
+    }
+  ],
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "New this month" },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Add" },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Columns",
+      "info": "Cards stack to one column on mobile regardless.",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 2
+    },
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "bg_color", "label": "Background", "info": "Leave blank to follow the store theme (light/dark)." },
+    { "type": "color", "id": "accent_color", "label": "Accent", "info": "Leave blank to follow the store theme (light/dark)." }
+  ],
+  "presets": [
+    {
+      "name": "Birdlabs Promo Strip",
+      "blocks": [{ "type": "promo" }, { "type": "promo" }]
+    }
+  ]
+}
+{% endschema %}
