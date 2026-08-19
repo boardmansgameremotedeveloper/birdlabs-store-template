@@ -302,12 +302,12 @@
         "eyebrow": "Premium trace minerals",
         "heading": "Wake up your soil",
         "heading_accent": "today",
-        "body": "An organic, ancient mineral deposit \u2014 quarried, composted and refined so the natural biology in your soil comes back to life.",
+        "body": "Bio trace minerals is an organic, ancient, formed mineral deposit that is quarried, composted and refined to bring all the natural microbes and biology to life.",
         "note": "Over seventy naturally occurring trace minerals. Feed the soil first, and the roots take up more of everything you already give them.",
-        "cta_label": "Shop now",
+        "cta_label": "Shop Bio Trace Mix",
         "cta_url": "#products",
-        "cta2_label": "Our story",
-        "cta2_url": "/pages/our-story",
+        "cta2_label": "See Real Grower Results",
+        "cta2_url": "#reviews",
         "media_position": "right",
         "image_radius": 20,
         "rotate_seconds": 6,
@@ -509,7 +509,7 @@
       ],
       "settings": {
         "eyebrow": "70+ trace minerals",
-        "heading": "Inside every scoop",
+        "heading": "Inside every scoop of Flora Bella",
         "body": "A broad spectrum of naturally occurring trace minerals \u2014 the elements soil biology needs to unlock what your ground already holds.",
         "ga_title": "Guaranteed analysis",
         "ga_subtitle": "View mineral percentages",
@@ -517,6 +517,54 @@
         "ga_footnote": "Minimum percentages by weight \u00b7 Lab tested",
         "anchor_id": "analysis",
         "bg_color": "",
+        "accent_color": "",
+        "bg_image": "shopify://shop_images/pexels-photo-2132250.jpg",
+        "bg_opacity": 10
+      }
+    },
+    "birdlabs_testimonials": {
+      "type": "birdlabs-testimonials",
+      "blocks": {
+        "q1": {
+          "type": "quote",
+          "settings": {
+            "quote": "I have been on farms and in gardens for 40 years. I used Flora Bella on my farm and noticed an immediate difference in the vigor of all my plants, especially the palms. I am amazed with the quality and performance of the Flora Bella product.",
+            "name": "Michael M.",
+            "location": "Larue MS",
+            "rating": 5
+          }
+        },
+        "q2": {
+          "type": "quote",
+          "settings": {
+            "quote": "What surprised me most was how quickly I noticed new growth. The plants responded faster than I expected, with visible vitality early on.",
+            "name": "Shannon L.",
+            "location": "Tampa FL",
+            "rating": 5
+          }
+        },
+        "q3": {
+          "type": "quote",
+          "settings": {
+            "quote": "I can't speak highly of it enough. It made our plants explode. We had a pretty balanced recipe, but it gave the plants a slower-release version of the micronutrients a lot of growers struggle to balance. It benefits smaller craft growers the most, but it boosted the gardens we ran \u2014 and that was 42 acres.",
+            "name": "Jacob C.",
+            "location": "Cooperstate",
+            "rating": 5
+          }
+        }
+      },
+      "block_order": [
+        "q1",
+        "q2",
+        "q3"
+      ],
+      "settings": {
+        "heading": "Gardeners are seeing real change",
+        "subheading": "Real results from real growers",
+        "anchor_id": "reviews",
+        "force_dark": true,
+        "bg_color": "",
+        "text_color": "",
         "accent_color": ""
       }
     }
@@ -527,6 +575,7 @@
     "birdlabs_hero3",
     "birdlabs_products_demo",
     "birdlabs_scoop",
+    "birdlabs_testimonials",
     "birdlabs_reels_demo",
     "birdlabs_story_demo",
     "birdlabs_contact_demo",

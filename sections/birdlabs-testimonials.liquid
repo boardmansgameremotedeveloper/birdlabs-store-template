@@ -1,0 +1,262 @@
+{% comment %}
+  sections/birdlabs-testimonials.liquid
+
+  "Gardeners are seeing real change" — a dark testimonial band with quote cards.
+  Ported from buyflorabella.com, where it is a customised native Shopify section.
+
+  Sampled from the live band rather than guessed: black ground, white type, an eyebrow line
+  under the heading, and three quote cards each carrying an initials avatar, a name and a
+  location.
+
+  Build notes:
+  - Testimonials are BLOCKS. On the source they are baked into the section; a store gains and
+    loses reviews constantly, so this has to be merchant-editable without a deploy.
+  - The initials avatar is DERIVED from the name rather than typed separately. One less field
+    to keep in sync, and it cannot drift out of agreement with the name beside it.
+  - Colours default to the theme palette, with an optional dark override so the band can stay
+    dark while the rest of the page is light — which is how the source uses it.
+  - An optional rating renders as filled/empty stars with an accessible text equivalent, so
+    the value is not conveyed by glyph shape alone.
+{% endcomment %}
+
+{%- liquid
+  assign anchor = section.settings.anchor_id | strip | handleize
+  if anchor == blank
+    assign anchor = 'birdlabs-testimonials-' | append: section.id
+  endif
+  assign cards = section.blocks | where: 'type', 'quote'
+-%}
+
+<section
+  id="{{ anchor }}"
+  class="birdlabs-testi{% if section.settings.force_dark %} birdlabs-testi--dark{% endif %}"
+  data-section-id="{{ section.id }}"
+  style="
+    {%- if section.settings.bg_color != blank %}--ts-bg: {{ section.settings.bg_color }};{% endif -%}
+    {%- if section.settings.text_color != blank %}--ts-fg: {{ section.settings.text_color }};{% endif -%}
+    {%- if section.settings.accent_color != blank %}--ts-accent: {{ section.settings.accent_color }};{% endif -%}
+  "
+>
+  <div class="birdlabs-testi__inner">
+    <div class="birdlabs-testi__head birdlabs-reveal">
+      {%- if section.settings.heading != blank -%}
+        <h2 class="birdlabs-testi__heading">{{ section.settings.heading | escape }}</h2>
+      {%- endif -%}
+      {%- if section.settings.subheading != blank -%}
+        <p class="birdlabs-testi__sub">{{ section.settings.subheading | escape }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- if cards.size > 0 -%}
+      <div class="birdlabs-testi__grid">
+        {%- for block in cards -%}
+          {%- liquid
+            # Initials from the name: "Michael M." -> "MM". Derived, never typed twice.
+            assign parts = block.settings.name | strip | split: ' '
+            assign initials = ''
+            for part in parts limit: 2
+              # Take the letter FIRST. Chaining `append: part | slice: 0, 1` slices the
+              # accumulated string instead of the part, which yields one letter overall.
+              assign letter = part | slice: 0, 1 | upcase
+              assign initials = initials | append: letter
+            endfor
+            if initials == blank
+              assign initials = '·'
+            endif
+          -%}
+          <figure class="birdlabs-testi__card birdlabs-reveal" {{ block.shopify_attributes }}>
+            {%- if block.settings.rating > 0 -%}
+              <div class="birdlabs-testi__stars">
+                <span aria-hidden="true">
+                  {%- for i in (1..5) -%}
+                    {%- if i <= block.settings.rating %}★{% else %}☆{% endif -%}
+                  {%- endfor -%}
+                </span>
+                <span class="visually-hidden">
+                  {{ block.settings.rating }} out of 5
+                </span>
+              </div>
+            {%- endif -%}
+
+            <blockquote class="birdlabs-testi__quote">{{ block.settings.quote | escape }}</blockquote>
+
+            <figcaption class="birdlabs-testi__by">
+              <span class="birdlabs-testi__avatar" aria-hidden="true">{{ initials }}</span>
+              <span class="birdlabs-testi__who">
+                <span class="birdlabs-testi__name">{{ block.settings.name | escape }}</span>
+                {%- if block.settings.location != blank -%}
+                  <span class="birdlabs-testi__loc">{{ block.settings.location | escape }}</span>
+                {%- endif -%}
+              </span>
+            </figcaption>
+          </figure>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+<script src="{{ 'birdlabs-reveal.js' | asset_url }}" defer></script>
+
+{% stylesheet %}
+  .birdlabs-testi {
+    padding: 96px 24px;
+    background: var(--ts-bg, var(--bl-bg));
+    color: var(--ts-fg, var(--bl-fg));
+  }
+
+  /* The source runs this band dark against an otherwise light page. */
+  .birdlabs-testi--dark {
+    --ts-bg: #000000;
+    --ts-fg: #ffffff;
+    background: var(--ts-bg);
+    color: var(--ts-fg);
+  }
+
+  .birdlabs-testi__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .birdlabs-testi__head {
+    margin-bottom: 48px;
+    text-align: center;
+  }
+
+  .birdlabs-testi__heading {
+    margin: 0 0 10px;
+    font-family: var(--font-heading--family);
+    font-size: clamp(2rem, 4.5vw, 3.25rem);
+    font-weight: 800;
+    line-height: 1.08;
+  }
+
+  .birdlabs-testi__sub {
+    margin: 0;
+    font-family: var(--font-body--family);
+    font-size: 1rem;
+    opacity: 0.7;
+  }
+
+  .birdlabs-testi__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 20px;
+  }
+
+  .birdlabs-testi__card {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 26px;
+    border: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+    border-radius: 16px;
+    background: color-mix(in srgb, currentColor 6%, transparent);
+  }
+
+  .birdlabs-testi__stars {
+    margin-bottom: 12px;
+    color: var(--ts-accent, #ffc043);
+    font-size: 0.9375rem;
+    letter-spacing: 0.08em;
+  }
+
+  .birdlabs-testi__quote {
+    flex: 1 1 auto;
+    margin: 0 0 20px;
+    font-family: var(--font-body--family);
+    font-size: 0.9375rem;
+    font-style: italic;
+    line-height: 1.7;
+    opacity: 0.9;
+  }
+
+  .birdlabs-testi__by {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .birdlabs-testi__avatar {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--ts-accent, var(--bl-accent));
+    color: var(--bl-on-accent, #fff);
+    font-family: var(--font-heading--family);
+    font-size: 0.8125rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+  }
+
+  .birdlabs-testi__who { display: flex; flex-direction: column; }
+
+  .birdlabs-testi__name {
+    font-family: var(--font-body--family);
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  .birdlabs-testi__loc {
+    font-family: var(--font-body--family);
+    font-size: 0.75rem;
+    opacity: 0.6;
+  }
+
+  @media (max-width: 749px) {
+    .birdlabs-testi { padding: 64px 20px; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Birdlabs Testimonials",
+  "tag": "section",
+  "class": "birdlabs-testi-wrapper",
+  "max_blocks": 12,
+  "blocks": [
+    {
+      "type": "quote",
+      "name": "Testimonial",
+      "settings": [
+        { "type": "textarea", "id": "quote", "label": "Quote" },
+        { "type": "text", "id": "name", "label": "Name", "info": "The avatar initials are derived from this." },
+        { "type": "text", "id": "location", "label": "Location" },
+        { "type": "range", "id": "rating", "label": "Rating", "min": 0, "max": 5, "step": 1, "default": 5 }
+      ]
+    }
+  ],
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Gardeners are seeing real change" },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "Real results from real growers" },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "info": "For one-page navigation — \"reviews\" makes this reachable at /#reviews.",
+      "default": "reviews"
+    },
+    { "type": "header", "content": "Colors" },
+    {
+      "type": "checkbox",
+      "id": "force_dark",
+      "label": "Always dark",
+      "info": "Keeps this band dark even on the light theme, the way the source site uses it.",
+      "default": true
+    },
+    { "type": "color", "id": "bg_color", "label": "Background", "info": "Leave blank to follow the store theme." },
+    { "type": "color", "id": "text_color", "label": "Text", "info": "Leave blank to follow the store theme." },
+    { "type": "color", "id": "accent_color", "label": "Accent (stars, avatars)", "info": "Leave blank to follow the store theme." }
+  ],
+  "presets": [
+    {
+      "name": "Birdlabs Testimonials",
+      "blocks": [{ "type": "quote" }, { "type": "quote" }, { "type": "quote" }]
+    }
+  ]
+}
+{% endschema %}
