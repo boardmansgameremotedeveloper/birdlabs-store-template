@@ -43,6 +43,22 @@
     {%- if section.settings.accent_color != blank %}--sc-accent: {{ section.settings.accent_color }};{% endif -%}
   "
 >
+  {%- if section.settings.bg_image != blank -%}
+    {%- comment -%}
+      buyflorabella layers a photograph at ~10% under this band, over the off-white
+      gradient. Low opacity is the whole trick: at full strength it competes with the
+      mineral tiles, at 10% it just stops the section reading as flat.
+    {%- endcomment -%}
+    <div class="birdlabs-scoop__bg" aria-hidden="true"
+         style="opacity: {{ section.settings.bg_opacity | divided_by: 100.0 }};">
+      {{
+        section.settings.bg_image
+        | image_url: width: 1920
+        | image_tag: class: 'birdlabs-scoop__bg-img', loading: 'lazy', alt: ''
+      }}
+    </div>
+  {%- endif -%}
+
   <div class="birdlabs-scoop__inner">
     <div class="birdlabs-scoop__head birdlabs-reveal">
       {%- if section.settings.eyebrow != blank -%}
@@ -127,12 +143,29 @@
 
 {% stylesheet %}
   .birdlabs-scoop {
+    position: relative;
+    overflow: hidden;
     padding: 96px 24px;
     background: var(--sc-bg, var(--bl-bg));
     color: var(--bl-fg);
   }
 
+  .birdlabs-scoop__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .birdlabs-scoop__bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
   .birdlabs-scoop__inner {
+    position: relative;
+    z-index: 1;
     max-width: 1100px;
     margin: 0 auto;
   }
@@ -361,61 +394,191 @@
       "type": "mineral",
       "name": "Mineral tile",
       "settings": [
-        { "type": "text", "id": "symbol", "label": "Symbol", "default": "Mg" },
-        { "type": "text", "id": "name", "label": "Name", "default": "Magnesium" },
-        { "type": "text", "id": "number", "label": "Atomic number", "default": "12" },
-        { "type": "textarea", "id": "benefit", "label": "What it does" }
+        {
+          "type": "text",
+          "id": "symbol",
+          "label": "Symbol",
+          "default": "Mg"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Name",
+          "default": "Magnesium"
+        },
+        {
+          "type": "text",
+          "id": "number",
+          "label": "Atomic number",
+          "default": "12"
+        },
+        {
+          "type": "textarea",
+          "id": "benefit",
+          "label": "What it does"
+        }
       ]
     },
     {
       "type": "analysis",
       "name": "Analysis row",
       "settings": [
-        { "type": "text", "id": "element", "label": "Element", "default": "Calcium" },
-        { "type": "text", "id": "symbol", "label": "Symbol", "default": "Ca" },
-        { "type": "text", "id": "percentage", "label": "Percent", "default": "0.00%" }
+        {
+          "type": "text",
+          "id": "element",
+          "label": "Element",
+          "default": "Calcium"
+        },
+        {
+          "type": "text",
+          "id": "symbol",
+          "label": "Symbol",
+          "default": "Ca"
+        },
+        {
+          "type": "text",
+          "id": "percentage",
+          "label": "Percent",
+          "default": "0.00%"
+        }
       ]
     }
   ],
   "settings": [
-    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "70+ trace minerals" },
-    { "type": "text", "id": "heading", "label": "Heading", "default": "Inside every scoop" },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "70+ trace minerals"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Inside every scoop"
+    },
     {
       "type": "textarea",
       "id": "body",
       "label": "Body",
-      "default": "A broad spectrum of naturally occurring trace minerals — the elements soil biology needs to unlock what is already in your ground."
+      "default": "A broad spectrum of naturally occurring trace minerals \u2014 the elements soil biology needs to unlock what is already in your ground."
     },
-    { "type": "header", "content": "Guaranteed analysis" },
-    { "type": "text", "id": "ga_title", "label": "Panel title", "default": "Guaranteed analysis" },
-    { "type": "text", "id": "ga_subtitle", "label": "Panel subtitle", "default": "View mineral percentages" },
-    { "type": "checkbox", "id": "ga_open", "label": "Open by default", "default": false },
+    {
+      "type": "header",
+      "content": "Guaranteed analysis"
+    },
+    {
+      "type": "text",
+      "id": "ga_title",
+      "label": "Panel title",
+      "default": "Guaranteed analysis"
+    },
+    {
+      "type": "text",
+      "id": "ga_subtitle",
+      "label": "Panel subtitle",
+      "default": "View mineral percentages"
+    },
+    {
+      "type": "checkbox",
+      "id": "ga_open",
+      "label": "Open by default",
+      "default": false
+    },
     {
       "type": "text",
       "id": "ga_footnote",
       "label": "Footnote",
-      "default": "Minimum percentages by weight · Lab tested"
+      "default": "Minimum percentages by weight \u00b7 Lab tested"
     },
     {
       "type": "text",
       "id": "anchor_id",
       "label": "Anchor ID",
-      "info": "For one-page navigation — \"analysis\" makes this reachable at /#analysis.",
+      "info": "For one-page navigation \u2014 \"analysis\" makes this reachable at /#analysis.",
       "default": "analysis"
     },
-    { "type": "header", "content": "Colors" },
-    { "type": "color", "id": "bg_color", "label": "Background", "info": "Leave blank to follow the store theme (light/dark)." },
-    { "type": "color", "id": "accent_color", "label": "Accent", "info": "Leave blank to follow the store theme (light/dark)." }
+    {
+      "type": "header",
+      "content": "Background image"
+    },
+    {
+      "type": "image_picker",
+      "id": "bg_image",
+      "label": "Background image",
+      "info": "Sits behind the content at low opacity. Optional."
+    },
+    {
+      "type": "range",
+      "id": "bg_opacity",
+      "label": "Image opacity",
+      "min": 2,
+      "max": 40,
+      "step": 2,
+      "unit": "%",
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "info": "Leave blank to follow the store theme (light/dark)."
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent",
+      "info": "Leave blank to follow the store theme (light/dark)."
+    }
   ],
   "presets": [
     {
       "name": "Birdlabs Scoop Analysis",
       "blocks": [
-        { "type": "mineral", "settings": { "symbol": "Mg", "name": "Magnesium", "number": "12" } },
-        { "type": "mineral", "settings": { "symbol": "Fe", "name": "Iron", "number": "26" } },
-        { "type": "mineral", "settings": { "symbol": "Zn", "name": "Zinc", "number": "30" } },
-        { "type": "analysis", "settings": { "element": "Calcium", "symbol": "Ca", "percentage": "1.40%" } },
-        { "type": "analysis", "settings": { "element": "Magnesium", "symbol": "Mg", "percentage": "1.40%" } }
+        {
+          "type": "mineral",
+          "settings": {
+            "symbol": "Mg",
+            "name": "Magnesium",
+            "number": "12"
+          }
+        },
+        {
+          "type": "mineral",
+          "settings": {
+            "symbol": "Fe",
+            "name": "Iron",
+            "number": "26"
+          }
+        },
+        {
+          "type": "mineral",
+          "settings": {
+            "symbol": "Zn",
+            "name": "Zinc",
+            "number": "30"
+          }
+        },
+        {
+          "type": "analysis",
+          "settings": {
+            "element": "Calcium",
+            "symbol": "Ca",
+            "percentage": "1.40%"
+          }
+        },
+        {
+          "type": "analysis",
+          "settings": {
+            "element": "Magnesium",
+            "symbol": "Mg",
+            "percentage": "1.40%"
+          }
+        }
       ]
     }
   ]

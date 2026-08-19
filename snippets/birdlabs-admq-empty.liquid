@@ -1,0 +1,67 @@
+{% comment %}
+  snippets/birdlabs-admq-empty.liquid
+
+  A marquee slot with no advertiser creative. Two modes, because "unsold" and "house ad" are
+  different things and conflating them wastes the strip:
+
+    advertise — the striped "Advertise here" card. Genuinely open inventory. It still LINKS to
+                a product, so even the for-sale slot is not a dead end.
+    product   — a house ad: the product's own image and name. Used for slots we are not
+                actively trying to sell, so the strip works as merchandising in the meantime.
+
+  Params:
+    filler — product list to draw from
+    index  — slot position, used to pick a product (cycles, so slots differ)
+    pass   — 1 or 2; the track renders twice for a seamless loop and the duplicate must stay
+             out of the tab order and hidden from assistive tech
+    mode   — 'advertise' or 'product'
+    label  — text for the advertise card
+{% endcomment %}
+
+{%- liquid
+  assign pool_size = filler.size
+  assign product = nil
+  if pool_size > 0
+    assign pick = index | modulo: pool_size
+    assign product = filler[pick]
+  endif
+  assign dupe = false
+  if pass == 2
+    assign dupe = true
+  endif
+-%}
+
+{%- if product == blank -%}
+  {%- comment -%} Nothing to point at — inert placeholder rather than a broken link. {%- endcomment -%}
+  <span class="birdlabs-admq__slot birdlabs-admq__slot--empty" aria-hidden="true">
+    <span class="birdlabs-admq__empty-label">{{ label | default: 'Advertise here' | escape }}</span>
+  </span>
+
+{%- elsif mode == 'product' -%}
+  <a
+    class="birdlabs-admq__slot birdlabs-admq__slot--product"
+    href="{{ product.url }}"
+    {% if dupe %}tabindex="-1" aria-hidden="true"{% endif %}
+  >
+    {%- if product.featured_image -%}
+      {{
+        product.featured_image
+        | image_url: width: 400
+        | image_tag: class: 'birdlabs-admq__house-img', loading: 'lazy', alt: ''
+      }}
+    {%- endif -%}
+    <span class="birdlabs-admq__house-body">
+      <span class="birdlabs-admq__house-name">{{ product.title | escape }}</span>
+      <span class="birdlabs-admq__house-price">{{ product.price | money }}</span>
+    </span>
+  </a>
+
+{%- else -%}
+  <a
+    class="birdlabs-admq__slot birdlabs-admq__slot--empty"
+    href="{{ product.url }}"
+    {% if dupe %}tabindex="-1" aria-hidden="true"{% endif %}
+  >
+    <span class="birdlabs-admq__empty-label">{{ label | default: 'Advertise here' | escape }}</span>
+  </a>
+{%- endif -%}

@@ -36,6 +36,14 @@
 {% endcomment %}
 
 {%- liquid
+  # An unfilled slot used to be a dead striped rectangle. It still LOOKS like available
+  # inventory, but it now links to a product, so the space sells something either way.
+  # Products cycle by index so five empty slots do not all point at the same item.
+  assign filler = collections.all.products
+  if section.settings.fallback_collection != blank
+    assign filler = collections[section.settings.fallback_collection].products
+  endif
+
   assign slot_w = section.settings.slot_width
   assign slot_h = section.settings.slot_height
   assign ad_blocks = section.blocks | where: 'type', 'slot'
@@ -86,7 +94,15 @@
                   }}
                 </a>
               {%- else -%}
-                <span class="birdlabs-admq__slot birdlabs-admq__slot--empty" aria-hidden="true"></span>
+                {%- liquid
+                  assign mode = 'product'
+                  if forloop.index0 < section.settings.advertise_slots
+                    assign mode = 'advertise'
+                  endif
+                -%}
+                {%- render 'birdlabs-admq-empty',
+                  filler: filler, index: forloop.index0, pass: pass,
+                  mode: mode, label: section.settings.empty_label -%}
               {%- endif -%}
             {%- endfor -%}
 
@@ -95,7 +111,19 @@
               the point of the original design, not an oversight.
             {%- endcomment -%}
             {%- for i in (1..placeholders) -%}
-              <span class="birdlabs-admq__slot birdlabs-admq__slot--empty" aria-hidden="true"></span>
+              {%- liquid
+                # Product choice uses the overall position so slots show different items…
+                assign offset = ad_blocks.size | plus: forloop.index0
+                # …but the advertise/house split counts UNFILLED slots only. Using the
+                # overall offset made `1 < 1` false and produced zero open slots.
+                assign mode = 'product'
+                if forloop.index0 < section.settings.advertise_slots
+                  assign mode = 'advertise'
+                endif
+              -%}
+              {%- render 'birdlabs-admq-empty',
+                filler: filler, index: offset, pass: pass,
+                mode: mode, label: section.settings.empty_label -%}
             {%- endfor -%}
           </div>
         {%- endfor -%}
@@ -174,6 +202,65 @@
    * because a black-on-dark placeholder is invisible — which defeats the entire point of
    * showing unsold inventory. Default suits a dark bar; lighten it for a light one.
    */
+  /* House ad: product image with its name and price over a readable scrim. */
+  .birdlabs-admq__slot--product {
+    position: relative;
+    display: block;
+    background: var(--bl-surface);
+    text-decoration: none;
+  }
+
+  .birdlabs-admq__house-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .birdlabs-admq__house-body {
+    position: absolute;
+    inset: auto 0 0 0;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 10px;
+    background: linear-gradient(to top, rgb(0 0 0 / 72%), rgb(0 0 0 / 0%));
+    color: #fff;
+  }
+
+  .birdlabs-admq__house-name {
+    overflow: hidden;
+    font-family: var(--font-body--family);
+    font-size: 0.75rem;
+    font-weight: 700;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .birdlabs-admq__house-price {
+    flex: 0 0 auto;
+    font-family: var(--font-body--family);
+    font-size: 0.75rem;
+  }
+
+  .birdlabs-admq__empty-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: var(--bl-fg);
+    font-family: var(--font-body--family);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    opacity: 0.55;
+  }
+
+  a.birdlabs-admq__slot--empty:hover .birdlabs-admq__empty-label { opacity: 0.9; }
+
   .birdlabs-admq__slot--empty {
     background: repeating-linear-gradient(
       45deg,
@@ -227,6 +314,32 @@
     {
       "type": "header",
       "content": "Strip"
+    },
+    {
+      "type": "paragraph",
+      "content": "Slots you have not filled with a creative still show as available inventory \u2014 but they link to a product rather than nowhere, so the space is never wasted."
+    },
+    {
+      "type": "collection",
+      "id": "fallback_collection",
+      "label": "Products for unfilled slots",
+      "info": "Leave blank to use the whole catalogue."
+    },
+    {
+      "type": "range",
+      "id": "advertise_slots",
+      "label": "Open \"advertise here\" slots",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "default": 1,
+      "info": "Unfilled slots beyond this many become house ads showing a real product, so the strip still merchandises."
+    },
+    {
+      "type": "text",
+      "id": "empty_label",
+      "label": "Unfilled slot text",
+      "default": "Advertise here"
     },
     {
       "type": "range",

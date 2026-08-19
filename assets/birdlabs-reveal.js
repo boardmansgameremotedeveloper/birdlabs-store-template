@@ -20,6 +20,16 @@
   var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var observer = null;
 
+  /*
+   * Progressive enhancement, not a dependency.
+   *
+   * The reveal styles hide content until this script shows it. If the script never runs —
+   * blocked, failed, slow — that content is invisible forever, which is a silent content
+   * outage rather than a missing animation. So the hidden state is scoped to this class,
+   * added the moment the script executes. No script, no class, content simply shows.
+   */
+  document.documentElement.classList.add('birdlabs-js');
+
   function revealNow(el) {
     el.classList.add('is-in-view');
   }
