@@ -173,8 +173,64 @@
     },
     "birdlabs_admq": {
       "type": "birdlabs-ad-marquee",
-      "blocks": {},
-      "block_order": [],
+      "blocks": {
+        "s1": {
+          "type": "slot",
+          "settings": {
+            "image": "shopify://shop_images/advertise-here-1.png",
+            "link": "/pages/contact",
+            "alt": "Advertise here \u2014 this ad slot is available"
+          }
+        },
+        "s2": {
+          "type": "slot",
+          "settings": {
+            "image": "shopify://shop_images/advertise-here-2.png",
+            "link": "/pages/contact",
+            "alt": "Advertise here \u2014 this ad slot is available"
+          }
+        },
+        "s3": {
+          "type": "slot",
+          "settings": {
+            "image": "shopify://shop_images/advertise-here-3.png",
+            "link": "/pages/contact",
+            "alt": "Advertise here \u2014 this ad slot is available"
+          }
+        },
+        "s4": {
+          "type": "slot",
+          "settings": {
+            "image": "shopify://shop_images/advertise-here-4.png",
+            "link": "/pages/contact",
+            "alt": "Advertise here \u2014 this ad slot is available"
+          }
+        },
+        "s5": {
+          "type": "slot",
+          "settings": {
+            "image": "shopify://shop_images/advertise-here-5.png",
+            "link": "/pages/contact",
+            "alt": "Advertise here \u2014 this ad slot is available"
+          }
+        },
+        "lead": {
+          "type": "lead_in",
+          "settings": {
+            "image": "shopify://shop_images/advertise-here-1.png",
+            "link": "/pages/contact",
+            "alt": "Advertise here \u2014 featured ad slot"
+          }
+        }
+      },
+      "block_order": [
+        "s1",
+        "s2",
+        "s3",
+        "s4",
+        "s5",
+        "lead"
+      ],
       "settings": {
         "total_slots": 5,
         "slot_width": 300,
@@ -182,7 +238,7 @@
         "gap": 12,
         "scroll_speed": 18,
         "direction": "left",
-        "show_lead_in": false,
+        "show_lead_in": true,
         "lead_in_width": 300,
         "bg_color": "",
         "border_color": "",
