@@ -2118,29 +2118,115 @@
     ]
   },
   {
-    "name": "Birdlabs dark theme",
+    "name": "Birdlabs themes",
     "settings": [
       {
         "type": "paragraph",
-        "content": "Colors used when a shopper switches the storefront to dark. Shopify's own palette is merchant-facing only, so these fill the gap."
+        "content": "Two complete palettes a shopper can switch between with the header toggle. Leave a section's own colour settings blank and it follows these; set one and it overrides. Defaults are the FLTHQ look for light and the buyflorabella look for dark."
+      },
+      {
+        "type": "header",
+        "content": "Light theme"
       },
       {
         "type": "color",
-        "id": "birdlabs_dark_background",
-        "label": "Dark background",
-        "default": "#111318"
+        "id": "bl_light_bg",
+        "label": "Background",
+        "default": "#ffffff"
       },
       {
         "type": "color",
-        "id": "birdlabs_dark_foreground",
-        "label": "Dark text",
-        "default": "#f2f4f7"
+        "id": "bl_light_surface",
+        "label": "Surface / panel",
+        "default": "#dceefb"
       },
       {
         "type": "color",
-        "id": "birdlabs_dark_border",
-        "label": "Dark border",
-        "default": "#2a2f3a"
+        "id": "bl_light_band",
+        "label": "Band (header, strips)",
+        "default": "#a8d5f2"
+      },
+      {
+        "type": "color",
+        "id": "bl_light_fg",
+        "label": "Text",
+        "default": "#0b2545"
+      },
+      {
+        "type": "color",
+        "id": "bl_light_muted",
+        "label": "Muted text",
+        "default": "#5b7291"
+      },
+      {
+        "type": "color",
+        "id": "bl_light_border",
+        "label": "Border",
+        "default": "#c8dff0"
+      },
+      {
+        "type": "color",
+        "id": "bl_light_accent",
+        "label": "Accent",
+        "default": "#0b2545"
+      },
+      {
+        "type": "color",
+        "id": "bl_light_on_accent",
+        "label": "Text on accent",
+        "default": "#ffffff"
+      },
+      {
+        "type": "header",
+        "content": "Dark theme"
+      },
+      {
+        "type": "color",
+        "id": "bl_dark_bg",
+        "label": "Background",
+        "default": "#0a0015"
+      },
+      {
+        "type": "color",
+        "id": "bl_dark_surface",
+        "label": "Surface / panel",
+        "default": "#1a1030"
+      },
+      {
+        "type": "color",
+        "id": "bl_dark_band",
+        "label": "Band (header, strips)",
+        "default": "#1a1030"
+      },
+      {
+        "type": "color",
+        "id": "bl_dark_fg",
+        "label": "Text",
+        "default": "#f2f2f5"
+      },
+      {
+        "type": "color",
+        "id": "bl_dark_muted",
+        "label": "Muted text",
+        "default": "#a8a8b8"
+      },
+      {
+        "type": "color",
+        "id": "bl_dark_border",
+        "label": "Border",
+        "default": "#2f2447"
+      },
+      {
+        "type": "color",
+        "id": "bl_dark_accent",
+        "label": "Accent",
+        "default": "#a78bfa"
+      },
+      {
+        "type": "color",
+        "id": "bl_dark_on_accent",
+        "label": "Text on accent",
+        "default": "#12002a"
       }
     ]
   }

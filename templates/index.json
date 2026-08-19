@@ -9,40 +9,6 @@
  */
 {
   "sections": {
-    "birdlabs_hero2_demo": {
-      "type": "birdlabs-custom-hero2",
-      "settings": {
-        "eyebrow": "HEMP-DERIVED \u00b7 NANOSIZED THC",
-        "heading_line1": "Elevate your",
-        "heading_line2": "Flight",
-        "subtext": "Ported from FLTHQ to Horizon 4.1.4. Everything on this page is a Birdlabs section.",
-        "pills": "Free shipping, Easy returns, Made to order",
-        "cta_primary_label": "Shop now",
-        "cta_primary_url": "#products",
-        "cta_secondary_label": "Our story",
-        "cta_secondary_url": "#story",
-        "anchor_id": "home",
-        "section_height": 100,
-        "show_bg_images": true,
-        "bg_color": "#dceefb",
-        "show_clouds": true,
-        "show_announcement": false,
-        "bg_image_1": "shopify://shop_images/hero_background_pexels-ingewallu-122110_a3c90111-fbca-4d77-a53e-c18c3a1cc56b.jpg",
-        "bg_image_2": "shopify://shop_images/hero_background_pexels-eduardolimabrport-4006600.jpg",
-        "bg_image_3": "shopify://shop_images/hero_background_pexels-stevecormie-33337421.jpg",
-        "show_drift": true,
-        "drift_shape": "flower",
-        "drift_count": 18,
-        "drift_size": 48,
-        "drift_opacity": 70,
-        "drift_color": "#ffffff",
-        "drift_glow": "#87ceeb",
-        "show_body_bg": true,
-        "body_bg_color": "#ffffff",
-        "body_bg_border": "thin",
-        "body_text_color": "#0b2545"
-      }
-    },
     "birdlabs_products_demo": {
       "type": "birdlabs-products-1",
       "settings": {
@@ -52,7 +18,7 @@
         "show_filters": true,
         "all_label": "All products",
         "products_shown": 24,
-        "source_collection": "demo-template",
+        "source_collection": "demo-buyflorabella",
         "category_source": "tags",
         "tag_prefix": "cat:"
       }
@@ -199,7 +165,7 @@
         "heading": "See it in action",
         "anchor_id": "videos",
         "privacy_mode": true,
-        "bg_color": "#fafafa",
+        "bg_color": "",
         "show_glow": true,
         "glow_color_1": "#ff1493",
         "glow_color_2": "#d4ff00"
@@ -218,9 +184,9 @@
         "direction": "left",
         "show_lead_in": false,
         "lead_in_width": 300,
-        "bg_color": "#12002a",
-        "border_color": "#2a1247",
-        "stripe_color": "#3a2a5c"
+        "bg_color": "",
+        "border_color": "",
+        "stripe_color": ""
       }
     },
     "birdlabs_callback": {
@@ -263,15 +229,88 @@
         "topic_placeholder": "What would you like to talk through?",
         "reassurance": "We use your number only to return this call.",
         "anchor_id": "callback",
-        "bg_color": "#12002a",
-        "text_color": "#f2f4f7",
-        "accent_color": "#a78bfa"
+        "bg_color": "",
+        "text_color": "",
+        "accent_color": ""
+      }
+    },
+    "birdlabs_hero3": {
+      "type": "birdlabs-custom-hero3",
+      "blocks": {
+        "i1": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/20260105_163329.jpg",
+            "alt": "Flora Bella in the garden"
+          }
+        },
+        "i2": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Why_Growers_Choose_1_of_6_Compost_pile.jpg",
+            "alt": "Compost pile"
+          }
+        },
+        "i3": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Why_Growers_Choose_2_of_6_FB_Zoom_in.jpg",
+            "alt": "Trace minerals close up"
+          }
+        },
+        "p1": {
+          "type": "point",
+          "settings": {
+            "icon": "\ud83c\udf31",
+            "text": "Organic trace minerals"
+          }
+        },
+        "p2": {
+          "type": "point",
+          "settings": {
+            "icon": "\ud83e\udeb4",
+            "text": "Safe for soil, coco and hydro"
+          }
+        },
+        "p3": {
+          "type": "point",
+          "settings": {
+            "icon": "\ud83c\uddfa\ud83c\uddf8",
+            "text": "Quarried and refined in the USA"
+          }
+        }
+      },
+      "block_order": [
+        "i1",
+        "i2",
+        "i3",
+        "p1",
+        "p2",
+        "p3"
+      ],
+      "settings": {
+        "eyebrow": "Premium trace minerals",
+        "heading": "Wake up your soil",
+        "heading_accent": "today",
+        "body": "An organic, ancient mineral deposit \u2014 quarried, composted and refined so the natural biology in your soil comes back to life.",
+        "note": "Over seventy naturally occurring trace minerals. Feed the soil first, and the roots take up more of everything you already give them.",
+        "cta_label": "Shop now",
+        "cta_url": "#products",
+        "cta2_label": "Our story",
+        "cta2_url": "/pages/our-story",
+        "media_position": "right",
+        "image_radius": 20,
+        "rotate_seconds": 6,
+        "anchor_id": "home",
+        "bg_color": "",
+        "text_color": "",
+        "accent_color": ""
       }
     }
   },
   "order": [
     "birdlabs_admq",
-    "birdlabs_hero2_demo",
+    "birdlabs_hero3",
     "birdlabs_products_demo",
     "birdlabs_reels_demo",
     "birdlabs_story_demo",

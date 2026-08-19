@@ -48,7 +48,9 @@
   data-section-id="{{ section.id }}"
   style="
     --birdlabs-hero2-min-height: {{ section.settings.section_height }}vh;
-    {%- unless use_images %} background: {{ section.settings.bg_color }};{% endunless -%}
+    {%- unless use_images -%}
+      {%- if section.settings.bg_color != blank %} background: {{ section.settings.bg_color }};{% endif -%}
+    {%- endunless -%}
   "
 >
   {%- if use_images -%}
@@ -99,7 +101,7 @@
 
   <div class="birdlabs-hero2__content">
     {%- if section.settings.eyebrow != blank -%}
-      <div class="birdlabs-hero2__eyebrow" style="color: {{ section.settings.eyebrow_color }};">
+      <div class="birdlabs-hero2__eyebrow" {% if section.settings.eyebrow_color != blank %}style="color: {{ section.settings.eyebrow_color }};"{% endif %}>
         <span class="birdlabs-hero2__rule"></span>
         {{ section.settings.eyebrow | escape }}
         <span class="birdlabs-hero2__rule"></span>
@@ -107,11 +109,11 @@
     {%- endif -%}
 
     {%- if section.settings.heading_line1 != blank or section.settings.heading_line2 != blank -%}
-      <h2 class="birdlabs-hero2__heading" style="color: {{ section.settings.heading_line1_color }};">
+      <h2 class="birdlabs-hero2__heading" {% if section.settings.heading_line1_color != blank %}style="color: {{ section.settings.heading_line1_color }};"{% endif %}>
         {{- section.settings.heading_line1 | escape -}}
         {%- if section.settings.heading_line2 != blank -%}
           <br>
-          <span style="color: {{ section.settings.heading_line2_color }};">
+          <span {% if section.settings.heading_line2_color != blank %}style="color: {{ section.settings.heading_line2_color }};"{% endif %}>
             {{- section.settings.heading_line2 | escape -}}
           </span>
         {%- endif -%}
@@ -137,12 +139,12 @@
             {%- if border_style != blank %} border: {{ border_style }};{% endif -%}
           "
         >
-          <p class="birdlabs-hero2__body" style="color: {{ section.settings.body_text_color }};">
+          <p class="birdlabs-hero2__body" {% if section.settings.body_text_color != blank %}style="color: {{ section.settings.body_text_color }};"{% endif %}>
             {{- section.settings.subtext | escape -}}
           </p>
         </div>
       {%- else -%}
-        <p class="birdlabs-hero2__body" style="color: {{ section.settings.body_text_color }};">
+        <p class="birdlabs-hero2__body" {% if section.settings.body_text_color != blank %}style="color: {{ section.settings.body_text_color }};"{% endif %}>
           {{- section.settings.subtext | escape -}}
         </p>
       {%- endif -%}
@@ -202,6 +204,9 @@
 
 {% stylesheet %}
   .birdlabs-hero2 {
+    /* Falls back to the theme palette; a section colour setting overrides inline. */
+    background: var(--bl-surface);
+    color: var(--bl-fg);
     position: relative;
     display: flex;
     align-items: center;
@@ -340,6 +345,7 @@
   }
 
   .birdlabs-hero2__body-bg {
+    background: var(--bl-bg);
     max-width: 560px;
     margin: 0 auto 40px;
     padding: 20px;
@@ -370,17 +376,17 @@
   .birdlabs-hero2__cta-primary {
     padding: 16px 48px;
     border: none;
-    background: var(--birdlabs-hero2-cta-bg, #1a1a1a);
-    color: var(--birdlabs-hero2-cta-fg, #fff);
+    background: var(--bl-accent);
+    color: var(--bl-on-accent);
     box-shadow: 0 8px 30px rgb(0 0 0 / 25%);
   }
 
   .birdlabs-hero2__cta-secondary {
     padding: 14px 48px;
     border: 2px solid currentColor;
-    background: rgba(255, 255, 255, 0.6);
+    background: color-mix(in srgb, var(--bl-bg) 60%, transparent);
     backdrop-filter: blur(8px);
-    color: var(--birdlabs-hero2-cta-bg, #1a1a1a);
+    color: var(--bl-fg);
   }
 
   .birdlabs-hero2__pills {
@@ -405,8 +411,8 @@
   .birdlabs-hero2__announcement {
     position: absolute;
     z-index: 3;
-    background: var(--birdlabs-hero2-cta-bg, #1a1a1a);
-    color: #fff;
+    background: var(--bl-accent);
+    color: var(--bl-on-accent);
     font-family: var(--font-body--family);
     font-size: 0.8125rem;
     font-weight: 700;
@@ -601,8 +607,7 @@
       "type": "color",
       "id": "bg_color",
       "label": "Background color",
-      "info": "Used when background images are off.",
-      "default": "#dceefb"
+      "info": "Used when background images are off."
     },
     {
       "type": "checkbox",
@@ -610,7 +615,10 @@
       "label": "Show soft cloud layer",
       "default": true
     },
-    { "type": "header", "content": "Drifting particles" },
+    {
+      "type": "header",
+      "content": "Drifting particles"
+    },
     {
       "type": "checkbox",
       "id": "show_drift",
@@ -624,16 +632,61 @@
       "label": "Particle shape",
       "default": "flower",
       "options": [
-        { "value": "flower", "label": "Flower of life" },
-        { "value": "snowflake", "label": "Snowflake" },
-        { "value": "hexagon", "label": "Hexagon" }
+        {
+          "value": "flower",
+          "label": "Flower of life"
+        },
+        {
+          "value": "snowflake",
+          "label": "Snowflake"
+        },
+        {
+          "value": "hexagon",
+          "label": "Hexagon"
+        }
       ]
     },
-    { "type": "range", "id": "drift_count", "label": "How many", "min": 4, "max": 40, "step": 2, "default": 18 },
-    { "type": "range", "id": "drift_size", "label": "Size", "min": 16, "max": 96, "step": 4, "unit": "px", "default": 48 },
-    { "type": "range", "id": "drift_opacity", "label": "Opacity", "min": 10, "max": 100, "step": 5, "unit": "%", "default": 70 },
-    { "type": "color", "id": "drift_color", "label": "Particle color", "default": "#ffffff" },
-    { "type": "color", "id": "drift_glow", "label": "Glow color", "default": "#87ceeb" },
+    {
+      "type": "range",
+      "id": "drift_count",
+      "label": "How many",
+      "min": 4,
+      "max": 40,
+      "step": 2,
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "drift_size",
+      "label": "Size",
+      "min": 16,
+      "max": 96,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "drift_opacity",
+      "label": "Opacity",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 70
+    },
+    {
+      "type": "color",
+      "id": "drift_color",
+      "label": "Particle color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "drift_glow",
+      "label": "Glow color",
+      "default": "#87ceeb"
+    },
     {
       "type": "header",
       "content": "Colors"
@@ -642,25 +695,25 @@
       "type": "color",
       "id": "eyebrow_color",
       "label": "Eyebrow color",
-      "default": "#0b2545"
+      "info": "Leave blank to follow the store theme (light/dark)."
     },
     {
       "type": "color",
       "id": "heading_line1_color",
       "label": "Heading line 1 color",
-      "default": "#0b2545"
+      "info": "Leave blank to follow the store theme (light/dark)."
     },
     {
       "type": "color",
       "id": "heading_line2_color",
       "label": "Heading line 2 color",
-      "default": "#1e3a5f"
+      "info": "Leave blank to follow the store theme (light/dark)."
     },
     {
       "type": "color",
       "id": "body_text_color",
       "label": "Body text color",
-      "default": "#334155"
+      "info": "Leave blank to follow the store theme (light/dark)."
     },
     {
       "type": "header",
@@ -677,8 +730,7 @@
       "type": "color",
       "id": "body_bg_color",
       "label": "Panel color",
-      "info": "Applied at 60% opacity.",
-      "default": "#ffffff"
+      "info": "Applied at 60% opacity."
     },
     {
       "type": "select",
@@ -686,10 +738,22 @@
       "label": "Panel border",
       "default": "none",
       "options": [
-        { "value": "none", "label": "None" },
-        { "value": "thin", "label": "Thin (1px)" },
-        { "value": "medium", "label": "Medium (2px)" },
-        { "value": "thick", "label": "Thick (4px)" }
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "thin",
+          "label": "Thin (1px)"
+        },
+        {
+          "value": "medium",
+          "label": "Medium (2px)"
+        },
+        {
+          "value": "thick",
+          "label": "Thick (4px)"
+        }
       ]
     },
     {
@@ -714,10 +778,22 @@
       "label": "Announcement position",
       "default": "bottom",
       "options": [
-        { "value": "bottom", "label": "Bottom" },
-        { "value": "top", "label": "Top" },
-        { "value": "right", "label": "Right" },
-        { "value": "left", "label": "Left" }
+        {
+          "value": "bottom",
+          "label": "Bottom"
+        },
+        {
+          "value": "top",
+          "label": "Top"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        },
+        {
+          "value": "left",
+          "label": "Left"
+        }
       ]
     }
   ],

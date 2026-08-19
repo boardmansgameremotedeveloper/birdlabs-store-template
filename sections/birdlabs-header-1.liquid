@@ -23,6 +23,12 @@
 {%- liquid
   assign scheme = section.settings.color_scheme
   case scheme
+    when 'auto'
+      # Blank -> the stylesheet's var(--bl-*) defaults apply, so the header follows
+      # whichever theme the visitor has chosen. This is the point of the toggle.
+      assign bg = blank
+      assign fg = blank
+      assign muted = blank
     when 'light'
       assign bg = '#ffffff'
       assign fg = '#0b2545'
@@ -52,10 +58,10 @@
   class="birdlabs-header{% if transparent %} birdlabs-header--transparent{% endif %}{% if section.settings.sticky %} birdlabs-header--sticky{% endif %}"
   data-section-id="{{ section.id }}"
   style="
-    --bh-bg: {{ bg }};
-    --bh-fg: {{ fg }};
-    --bh-muted: {{ muted }};
-    --bh-accent: {{ section.settings.accent_color }};
+    {%- if bg != blank %}--bh-bg: {{ bg }};{% endif -%}
+    {%- if fg != blank %}--bh-fg: {{ fg }};{% endif -%}
+    {%- if muted != blank %}--bh-muted: {{ muted }};{% endif -%}
+    {%- if section.settings.accent_color != blank %}--bh-accent: {{ section.settings.accent_color }};{% endif -%}
     --bh-height: {{ section.settings.height }}px;
     --bh-radius: {{ section.settings.link_radius }}px;
   "
@@ -169,8 +175,9 @@
 {% stylesheet %}
   .birdlabs-header {
     display: block;
-    background: var(--bh-bg);
-    color: var(--bh-fg);
+    /* Falls back to the theme palette when the scheme is "Follow theme". */
+    background: var(--bh-bg, var(--bl-band));
+    color: var(--bh-fg, var(--bl-fg));
     transition: background-color 0.4s ease, box-shadow 0.3s ease;
   }
 
@@ -212,7 +219,7 @@
   }
 
   .birdlabs-header.is-scrolled {
-    background: var(--bh-bg);
+    background: var(--bh-bg, var(--bl-band));
     box-shadow: 0 1px 20px rgb(0 0 0 / 8%);
   }
 
@@ -279,7 +286,7 @@
     font-size: 0.6875rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--bh-muted);
+    color: var(--bh-muted, var(--bl-muted));
   }
 
   .birdlabs-header__nav {
@@ -295,7 +302,7 @@
   .birdlabs-header__link {
     padding: 8px 18px;
     border-radius: var(--bh-radius, 24px);
-    color: var(--bh-muted);
+    color: var(--bh-muted, var(--bl-muted));
     font-family: var(--font-body--family);
     font-size: 0.875rem;
     font-weight: 600;
@@ -307,7 +314,7 @@
 
   .birdlabs-header__link.is-active {
     background: color-mix(in srgb, var(--bh-fg) 8%, transparent);
-    color: var(--bh-fg);
+    color: var(--bh-fg, var(--bl-fg));
   }
 
   .birdlabs-header__actions {
@@ -322,7 +329,7 @@
     justify-content: center;
     width: 36px;
     height: 36px;
-    color: var(--bh-fg);
+    color: var(--bh-fg, var(--bl-fg));
   }
 
   .birdlabs-header__icon svg { width: 20px; height: 20px; }
@@ -333,8 +340,8 @@
     gap: 6px;
     padding: 8px 18px;
     border-radius: var(--bh-radius, 24px);
-    background: var(--bh-accent);
-    color: #fff;
+    background: var(--bh-accent, var(--bl-accent));
+    color: var(--bl-on-accent, #fff);
     font-family: var(--font-body--family);
     font-size: 0.8125rem;
     font-weight: 700;
@@ -359,7 +366,7 @@
     display: block;
     width: 20px;
     height: 2px;
-    background: var(--bh-fg);
+    background: var(--bh-fg, var(--bl-fg));
     transition: transform 0.25s ease, opacity 0.25s ease;
   }
 
@@ -381,7 +388,7 @@
   .birdlabs-header__mobile-link {
     padding: 12px 0;
     border-bottom: 1px solid color-mix(in srgb, var(--bh-fg) 10%, transparent);
-    color: var(--bh-fg);
+    color: var(--bh-fg, var(--bl-fg));
     font-family: var(--font-body--family);
     font-size: 1rem;
     font-weight: 600;
@@ -412,18 +419,36 @@
   "name": "Birdlabs Header",
   "tag": "header",
   "class": "birdlabs-header-wrapper",
-  "enabled_on": { "groups": ["header"] },
+  "enabled_on": {
+    "groups": [
+      "header"
+    ]
+  },
   "settings": [
-    { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" },
-    { "type": "header", "content": "Layout" },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
     {
       "type": "select",
       "id": "logo_position",
       "label": "Logo position",
       "default": "left",
       "options": [
-        { "value": "left", "label": "Left" },
-        { "value": "center", "label": "Center" }
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        }
       ]
     },
     {
@@ -433,9 +458,18 @@
       "info": "Where the menu sits in the space between the logo and the cart.",
       "default": "right",
       "options": [
-        { "value": "left", "label": "Left" },
-        { "value": "center", "label": "Center" },
-        { "value": "right", "label": "Right" }
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
       ]
     },
     {
@@ -458,7 +492,12 @@
       "unit": "px",
       "default": 24
     },
-    { "type": "checkbox", "id": "sticky", "label": "Stick to top on scroll", "default": true },
+    {
+      "type": "checkbox",
+      "id": "sticky",
+      "label": "Stick to top on scroll",
+      "default": true
+    },
     {
       "type": "checkbox",
       "id": "transparent_on_home",
@@ -466,27 +505,82 @@
       "info": "Turns solid once the visitor scrolls past it.",
       "default": false
     },
-    { "type": "header", "content": "Theme" },
+    {
+      "type": "header",
+      "content": "Theme"
+    },
     {
       "type": "select",
       "id": "color_scheme",
       "label": "Color scheme",
-      "default": "light",
+      "default": "auto",
       "options": [
-        { "value": "light", "label": "Light" },
-        { "value": "dark", "label": "Dark" },
-        { "value": "custom", "label": "Custom" }
+        {
+          "value": "auto",
+          "label": "Follow theme (recommended)"
+        },
+        {
+          "value": "light",
+          "label": "Always light"
+        },
+        {
+          "value": "dark",
+          "label": "Always dark"
+        },
+        {
+          "value": "custom",
+          "label": "Custom"
+        }
       ]
     },
-    { "type": "color", "id": "custom_bg", "label": "Custom background", "default": "#a8d5f2" },
-    { "type": "color", "id": "custom_fg", "label": "Custom text", "default": "#0b2545" },
-    { "type": "color", "id": "custom_muted", "label": "Custom muted text", "default": "#64748b" },
-    { "type": "color", "id": "accent_color", "label": "Cart button color", "default": "#0b2545" },
-    { "type": "header", "content": "Branding" },
-    { "type": "image_picker", "id": "logo_image", "label": "Logo image" },
-    { "type": "text", "id": "logo_text", "label": "Logo text", "info": "Used when no image is set." },
-    { "type": "text", "id": "logo_subtext", "label": "Logo subtext" },
-    { "type": "header", "content": "Actions" },
+    {
+      "type": "color",
+      "id": "custom_bg",
+      "label": "Custom background",
+      "info": "Leave blank to follow the store theme (light/dark)."
+    },
+    {
+      "type": "color",
+      "id": "custom_fg",
+      "label": "Custom text",
+      "info": "Leave blank to follow the store theme (light/dark)."
+    },
+    {
+      "type": "color",
+      "id": "custom_muted",
+      "label": "Custom muted text",
+      "info": "Leave blank to follow the store theme (light/dark)."
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Cart button color",
+      "info": "Leave blank to follow the store theme (light/dark)."
+    },
+    {
+      "type": "header",
+      "content": "Branding"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_image",
+      "label": "Logo image"
+    },
+    {
+      "type": "text",
+      "id": "logo_text",
+      "label": "Logo text",
+      "info": "Used when no image is set."
+    },
+    {
+      "type": "text",
+      "id": "logo_subtext",
+      "label": "Logo subtext"
+    },
+    {
+      "type": "header",
+      "content": "Actions"
+    },
     {
       "type": "checkbox",
       "id": "show_theme_toggle",
@@ -494,10 +588,29 @@
       "info": "Lets the shopper switch the whole storefront between light and dark. Defaults to their operating system preference until they choose.",
       "default": true
     },
-    { "type": "checkbox", "id": "show_search", "label": "Show search", "default": false },
-    { "type": "checkbox", "id": "show_account", "label": "Show account", "default": false },
-    { "type": "text", "id": "cart_label", "label": "Cart label", "default": "Cart" }
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Show search",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_account",
+      "label": "Show account",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "cart_label",
+      "label": "Cart label",
+      "default": "Cart"
+    }
   ],
-  "presets": [{ "name": "Birdlabs Header" }]
+  "presets": [
+    {
+      "name": "Birdlabs Header"
+    }
+  ]
 }
 {% endschema %}

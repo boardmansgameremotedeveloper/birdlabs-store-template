@@ -27,7 +27,7 @@
   id="{{ anchor }}"
   class="birdlabs-contact"
   data-section-id="{{ section.id }}"
-  style="background: {{ section.settings.bg_color }};"
+  {% if section.settings.bg_color != blank %}style="background: {{ section.settings.bg_color }};"{% endif %}
 >
   <div class="birdlabs-contact__inner">
     <div class="birdlabs-contact__col birdlabs-reveal">
@@ -151,7 +151,11 @@
 <script src="{{ 'birdlabs-reveal.js' | asset_url }}" defer></script>
 
 {% stylesheet %}
-  .birdlabs-contact { padding: 120px 40px; }
+  .birdlabs-contact {
+    padding: 120px 40px;
+    background: var(--bl-bg);
+    color: var(--bl-fg);
+  }
 
   .birdlabs-contact__inner {
     display: grid;
@@ -223,9 +227,9 @@
     gap: 16px;
     margin-top: 36px;
     padding: 20px;
-    border: 1px solid rgb(0 0 0 / 8%);
+    border: 1px solid var(--bl-border);
     border-radius: 16px;
-    background: rgb(255 255 255 / 60%);
+    background: var(--bl-bg);
     backdrop-filter: blur(8px);
   }
 
@@ -238,8 +242,8 @@
     width: 52px;
     height: 52px;
     border-radius: 10px;
-    background: var(--birdlabs-accent, #0b2545);
-    color: #fff;
+    background: var(--bl-accent);
+    color: var(--bl-on-accent);
     font-family: var(--font-body--family);
     font-size: 0.625rem;
     font-weight: 800;
@@ -277,9 +281,9 @@
 
   .birdlabs-contact__form-wrap {
     padding: 32px;
-    border: 1px solid rgb(0 0 0 / 10%);
+    border: 1px solid var(--bl-border);
     border-radius: 16px;
-    background: rgb(255 255 255 / 60%);
+    background: var(--bl-surface);
   }
 
   .birdlabs-contact__label {
@@ -297,10 +301,10 @@
     width: 100%;
     margin-bottom: 20px;
     padding: 12px 14px;
-    border: 1px solid rgb(0 0 0 / 15%);
+    border: 1px solid var(--bl-border);
     border-radius: 8px;
-    background: #fff;
-    color: inherit;
+    background: var(--bl-bg);
+    color: var(--bl-fg);
     font-family: var(--font-body--family);
     font-size: 0.9375rem;
   }
@@ -311,8 +315,8 @@
     padding: 14px 40px;
     border: none;
     border-radius: 40px;
-    background: var(--birdlabs-accent, #0b2545);
-    color: #fff;
+    background: var(--bl-accent);
+    color: var(--bl-on-accent);
     font-family: var(--font-heading--family);
     font-size: 0.9375rem;
     letter-spacing: 0.12em;
@@ -352,7 +356,7 @@
       "settings": [
         {
           "type": "paragraph",
-          "content": "State your real payment provider here. Left blank in the template on purpose — every clone inherits these defaults, and a store must not claim a processor it does not use."
+          "content": "State your real payment provider here. Left blank in the template on purpose \u2014 every clone inherits these defaults, and a store must not claim a processor it does not use."
         },
         {
           "type": "image_picker",
@@ -364,7 +368,7 @@
           "type": "text",
           "id": "badge_text",
           "label": "Badge text",
-          "info": "Used only when no logo is set. Short — it sits in a 52px tile."
+          "info": "Used only when no logo is set. Short \u2014 it sits in a 52px tile."
         },
         {
           "type": "text",
@@ -384,45 +388,104 @@
       "type": "info",
       "name": "Contact detail",
       "settings": [
-        { "type": "text", "id": "icon", "label": "Icon", "info": "An emoji, e.g. 📍 ✉️ 📱. Optional." },
-        { "type": "text", "id": "label", "label": "Label", "default": "Email" },
-        { "type": "text", "id": "value", "label": "Value", "default": "hello@example.com" }
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon",
+          "info": "An emoji, e.g. \ud83d\udccd \u2709\ufe0f \ud83d\udcf1. Optional."
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Email"
+        },
+        {
+          "type": "text",
+          "id": "value",
+          "label": "Value",
+          "default": "hello@example.com"
+        }
       ]
     }
   ],
   "settings": [
-    { "type": "text", "id": "eyebrow", "label": "Eyebrow text", "default": "Contact" },
-    { "type": "text", "id": "heading", "label": "Heading", "default": "Get in touch" },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text",
+      "default": "Contact"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Get in touch"
+    },
     {
       "type": "textarea",
       "id": "subtext",
       "label": "Intro paragraph",
       "default": "Questions about an order, or anything else? Send us a message."
     },
-    { "type": "text", "id": "submit_label", "label": "Submit button label", "default": "Send message" },
+    {
+      "type": "text",
+      "id": "submit_label",
+      "label": "Submit button label",
+      "default": "Send message"
+    },
     {
       "type": "textarea",
       "id": "note",
       "label": "Small print",
-      "info": "Optional note under the contact details — payment or shipping reassurance, for example."
+      "info": "Optional note under the contact details \u2014 payment or shipping reassurance, for example."
     },
     {
       "type": "text",
       "id": "anchor_id",
       "label": "Anchor ID",
-      "info": "For one-page navigation — \"contact\" makes this reachable at /#contact.",
+      "info": "For one-page navigation \u2014 \"contact\" makes this reachable at /#contact.",
       "default": "contact"
     },
-    { "type": "header", "content": "Colors" },
-    { "type": "color", "id": "bg_color", "label": "Background", "default": "#f0f7ff" }
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "info": "Leave blank to follow the store theme (light/dark)."
+    }
   ],
   "presets": [
     {
       "name": "Birdlabs Contact",
       "blocks": [
-        { "type": "info", "settings": { "icon": "📍", "label": "Address", "value": "123 Example St" } },
-        { "type": "info", "settings": { "icon": "✉️", "label": "Email", "value": "hello@example.com" } },
-        { "type": "info", "settings": { "icon": "📱", "label": "Phone", "value": "+1 555 0100" } }
+        {
+          "type": "info",
+          "settings": {
+            "icon": "\ud83d\udccd",
+            "label": "Address",
+            "value": "123 Example St"
+          }
+        },
+        {
+          "type": "info",
+          "settings": {
+            "icon": "\u2709\ufe0f",
+            "label": "Email",
+            "value": "hello@example.com"
+          }
+        },
+        {
+          "type": "info",
+          "settings": {
+            "icon": "\ud83d\udcf1",
+            "label": "Phone",
+            "value": "+1 555 0100"
+          }
+        }
       ]
     }
   ]

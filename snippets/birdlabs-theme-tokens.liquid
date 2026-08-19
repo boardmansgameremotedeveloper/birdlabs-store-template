@@ -1,51 +1,98 @@
 {% comment %}
   snippets/birdlabs-theme-tokens.liquid
 
-  Visitor-facing light/dark switching for Horizon.
+  The Birdlabs palette system — two complete themes a shopper can switch between.
 
-  WHY THIS IS NEEDED. Shopify's colour system is merchant-facing only: the merchant picks a
-  palette, and every visitor gets it. There is no built-in "dark mode" a shopper can switch to,
-  because Horizon computes --color-background / --color-foreground / --color-border once from
-  `settings.color_palette` and that is the end of it.
+  WHY THIS EXISTS. Shopify's colour system is merchant-facing only: the merchant picks a
+  palette and every visitor gets it. There is no visitor-switchable dark mode, because
+  Horizon computes its colour tokens once from `settings.color_palette` and stops there.
 
-  WHAT THIS DOES. It re-declares those same tokens under `[data-birdlabs-theme='dark']` on the
-  root element. Because every Horizon section reads the tokens rather than hard-coded colours,
-  overriding them at the root flips the whole storefront — stock sections included — without
-  touching a single Shopify file.
+  HOW IT WORKS. Two layers, and both matter:
 
-  The dark values are merchant-editable, so a store is not stuck with someone else's idea of
-  dark. Defaults are a neutral near-black with a soft off-white, which reads well against most
-  brand accents.
+  1. **Horizon's own tokens are re-declared** under [data-birdlabs-theme='dark'], so stock
+     Horizon sections follow the switch without editing a single Shopify file.
 
-  Usage: {% render 'birdlabs-theme-tokens' %} — once per page, from the header section.
+  2. **A `--bl-*` palette is published for the Birdlabs sections.** This is the part that was
+     missing: our sections previously wrote hard-coded hex from their own settings, so half
+     the page flipped and half did not — which is exactly what "the themes are quite off"
+     looked like. Now every Birdlabs section falls back to these tokens when its colour
+     setting is left blank, and only overrides when a merchant deliberately sets one.
+
+  THE TWO DEFAULT PALETTES, taken from the two real storefronts:
+
+    LIGHT  — FLTHQ. White and pale blue surfaces, deep navy text, light-blue accent bands.
+    DARK   — buyflorabella. Near-black purple ground (sampled: body rgb(10,10,10),
+             footer rgb(10,0,21)), light grey text, violet accent.
+
+  Every value is a theme setting, so a clone can re-skin both themes without touching code.
 {% endcomment %}
 
 {%- liquid
-  assign d_bg = settings.birdlabs_dark_background | default: '#111318'
-  assign d_fg = settings.birdlabs_dark_foreground | default: '#f2f4f7'
-  assign d_border = settings.birdlabs_dark_border | default: '#2a2f3a'
+  # ── LIGHT (FLTHQ) ──
+  assign l_bg = settings.bl_light_bg | default: '#ffffff'
+  assign l_surface = settings.bl_light_surface | default: '#dceefb'
+  assign l_fg = settings.bl_light_fg | default: '#0b2545'
+  assign l_muted = settings.bl_light_muted | default: '#5b7291'
+  assign l_border = settings.bl_light_border | default: '#c8dff0'
+  assign l_accent = settings.bl_light_accent | default: '#0b2545'
+  assign l_on_accent = settings.bl_light_on_accent | default: '#ffffff'
+  assign l_band = settings.bl_light_band | default: '#a8d5f2'
+
+  # ── DARK (buyflorabella) ──
+  assign d_bg = settings.bl_dark_bg | default: '#0a0015'
+  assign d_surface = settings.bl_dark_surface | default: '#1a1030'
+  assign d_fg = settings.bl_dark_fg | default: '#f2f2f5'
+  assign d_muted = settings.bl_dark_muted | default: '#a8a8b8'
+  assign d_border = settings.bl_dark_border | default: '#2f2447'
+  assign d_accent = settings.bl_dark_accent | default: '#a78bfa'
+  assign d_on_accent = settings.bl_dark_on_accent | default: '#12002a'
+  assign d_band = settings.bl_dark_band | default: '#1a1030'
 -%}
 
 <style>
+  :root {
+    --bl-bg: {{ l_bg }};
+    --bl-surface: {{ l_surface }};
+    --bl-fg: {{ l_fg }};
+    --bl-muted: {{ l_muted }};
+    --bl-border: {{ l_border }};
+    --bl-accent: {{ l_accent }};
+    --bl-on-accent: {{ l_on_accent }};
+    --bl-band: {{ l_band }};
+    /* Kept in sync so older rules referencing the accent keep working. */
+    --birdlabs-accent: {{ l_accent }};
+  }
+
   [data-birdlabs-theme='dark'] {
+    --bl-bg: {{ d_bg }};
+    --bl-surface: {{ d_surface }};
+    --bl-fg: {{ d_fg }};
+    --bl-muted: {{ d_muted }};
+    --bl-border: {{ d_border }};
+    --bl-accent: {{ d_accent }};
+    --bl-on-accent: {{ d_on_accent }};
+    --bl-band: {{ d_band }};
+    --birdlabs-accent: {{ d_accent }};
+
+    /* Horizon's own tokens, so stock sections follow the switch too. */
     --color-background: {{ d_bg }};
     --color-background-rgb: {{ d_bg.rgb }};
     --color-foreground: {{ d_fg }};
     --color-foreground-rgb: {{ d_fg.rgb }};
-    --color-foreground-muted: {{ d_fg | color_modify: 'alpha', 0.72 }};
-    --color-foreground-subdued: {{ d_fg | color_modify: 'alpha', 0.55 }};
+    --color-foreground-muted: {{ d_muted }};
+    --color-foreground-subdued: {{ d_muted }};
     --color-border: {{ d_border }};
     --color-border-rgb: {{ d_border.rgb }};
-    --color-input-background: {{ d_bg | color_lighten: 6 }};
+    --color-input-background: {{ d_surface }};
     --color-input-border: {{ d_border }};
     --color-input-text: {{ d_fg }};
     --color-input-text-rgb: {{ d_fg.rgb }};
     color-scheme: dark;
   }
 
-  /* Images and media are usually shot on light backgrounds; a slight knock-down stops them
-     glaring against a dark page without washing out the colour. */
-  [data-birdlabs-theme='dark'] img:not([src$='.svg']) { filter: brightness(0.94); }
+  /* Product photography is shot on light backgrounds; a slight knock-down stops it glaring
+     against a dark page without washing the colour out. SVG logos are left alone. */
+  [data-birdlabs-theme='dark'] img:not([src$='.svg']) { filter: brightness(0.92); }
 
   .birdlabs-theme-toggle {
     display: inline-flex;
@@ -61,6 +108,7 @@
     cursor: pointer;
   }
 
+  .birdlabs-theme-toggle:hover { background: rgb(127 127 127 / 18%); }
   .birdlabs-theme-toggle svg { width: 18px; height: 18px; }
   .birdlabs-theme-toggle__moon { display: none; }
   [data-birdlabs-theme='dark'] .birdlabs-theme-toggle__sun { display: none; }
@@ -68,17 +116,21 @@
 </style>
 
 <script>
-  /* Runs before first paint so a returning visitor's choice is applied without a flash of
-     the wrong theme. Deliberately inline and tiny for that reason. */
+  /*
+   * Runs before first paint, so a returning visitor never sees the wrong theme flash.
+   * Storage: localStorage key "birdlabs-theme", value "light" or "dark".
+   * With nothing stored we follow the OS via prefers-color-scheme, and keep following it
+   * until the visitor makes an explicit choice.
+   */
   (function () {
     try {
       var saved = localStorage.getItem('birdlabs-theme');
       var dark = saved
         ? saved === 'dark'
         : window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (dark) document.documentElement.setAttribute('data-birdlabs-theme', 'dark');
+      document.documentElement.setAttribute('data-birdlabs-theme', dark ? 'dark' : 'light');
     } catch (e) {
-      /* private mode: fall through to the merchant's palette */
+      document.documentElement.setAttribute('data-birdlabs-theme', 'light');
     }
   })();
 </script>

@@ -51,9 +51,9 @@
     --admq-slot-h: {{ slot_h }}px;
     --admq-gap: {{ section.settings.gap }}px;
     --admq-speed: {{ section.settings.scroll_speed }}s;
-    --admq-bg: {{ section.settings.bg_color }};
-    --admq-border: {{ section.settings.border_color }};
-    --admq-stripe: {{ section.settings.stripe_color }};
+    {%- if section.settings.bg_color != blank %}--admq-bg: {{ section.settings.bg_color }};{% endif -%}
+    {%- if section.settings.border_color != blank %}--admq-border: {{ section.settings.border_color }};{% endif -%}
+    {%- if section.settings.stripe_color != blank %}--admq-stripe: {{ section.settings.stripe_color }};{% endif -%}
   "
 >
   <div class="birdlabs-admq__inner">
@@ -127,8 +127,8 @@
     width: 100%;
     overflow: hidden;
     padding: 8px 0;
-    background: var(--admq-bg, transparent);
-    border-bottom: 1px solid var(--admq-border, rgb(255 255 255 / 8%));
+    background: var(--admq-bg, var(--bl-band));
+    border-bottom: 1px solid var(--admq-border, var(--bl-border));
   }
 
   .birdlabs-admq__inner {
@@ -200,12 +200,12 @@
   .birdlabs-admq__slot--empty {
     background: repeating-linear-gradient(
       45deg,
-      var(--admq-stripe, rgb(255 255 255 / 14%)),
-      var(--admq-stripe, rgb(255 255 255 / 14%)) 10px,
+      var(--admq-stripe, color-mix(in srgb, var(--bl-fg) 18%, transparent)),
+      var(--admq-stripe, color-mix(in srgb, var(--bl-fg) 18%, transparent)) 10px,
       transparent 10px,
       transparent 20px
     );
-    box-shadow: inset 0 0 0 1px var(--admq-stripe, rgb(255 255 255 / 14%));
+    box-shadow: inset 0 0 0 1px var(--admq-stripe, color-mix(in srgb, var(--bl-fg) 18%, transparent));
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -227,9 +227,22 @@
       "type": "slot",
       "name": "Ad slot",
       "settings": [
-        { "type": "image_picker", "id": "image", "label": "Creative" },
-        { "type": "url", "id": "link", "label": "Links to" },
-        { "type": "text", "id": "alt", "label": "Alt text", "info": "Describes the ad for screen readers." }
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Creative"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Links to"
+        },
+        {
+          "type": "text",
+          "id": "alt",
+          "label": "Alt text",
+          "info": "Describes the ad for screen readers."
+        }
       ]
     },
     {
@@ -237,14 +250,29 @@
       "name": "Lead-in slot",
       "limit": 1,
       "settings": [
-        { "type": "image_picker", "id": "image", "label": "Creative" },
-        { "type": "url", "id": "link", "label": "Links to" },
-        { "type": "text", "id": "alt", "label": "Alt text" }
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Creative"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Links to"
+        },
+        {
+          "type": "text",
+          "id": "alt",
+          "label": "Alt text"
+        }
       ]
     }
   ],
   "settings": [
-    { "type": "header", "content": "Strip" },
+    {
+      "type": "header",
+      "content": "Strip"
+    },
     {
       "type": "range",
       "id": "total_slots",
@@ -255,10 +283,40 @@
       "step": 1,
       "default": 5
     },
-    { "type": "range", "id": "slot_width", "label": "Slot width", "min": 120, "max": 600, "step": 10, "unit": "px", "default": 300 },
-    { "type": "range", "id": "slot_height", "label": "Slot height", "min": 40, "max": 300, "step": 10, "unit": "px", "default": 100 },
-    { "type": "range", "id": "gap", "label": "Gap between slots", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 12 },
-    { "type": "header", "content": "Motion" },
+    {
+      "type": "range",
+      "id": "slot_width",
+      "label": "Slot width",
+      "min": 120,
+      "max": 600,
+      "step": 10,
+      "unit": "px",
+      "default": 300
+    },
+    {
+      "type": "range",
+      "id": "slot_height",
+      "label": "Slot height",
+      "min": 40,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Gap between slots",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Motion"
+    },
     {
       "type": "range",
       "id": "scroll_speed",
@@ -276,11 +334,20 @@
       "label": "Direction",
       "default": "left",
       "options": [
-        { "value": "left", "label": "Right to left" },
-        { "value": "right", "label": "Left to right" }
+        {
+          "value": "left",
+          "label": "Right to left"
+        },
+        {
+          "value": "right",
+          "label": "Left to right"
+        }
       ]
     },
-    { "type": "header", "content": "Lead-in" },
+    {
+      "type": "header",
+      "content": "Lead-in"
+    },
     {
       "type": "checkbox",
       "id": "show_lead_in",
@@ -288,22 +355,50 @@
       "info": "Sits before the strip and stays put while the rest scrolls.",
       "default": false
     },
-    { "type": "range", "id": "lead_in_width", "label": "Lead-in width", "min": 120, "max": 600, "step": 10, "unit": "px", "default": 300 },
-    { "type": "header", "content": "Appearance" },
-    { "type": "color", "id": "bg_color", "label": "Background", "default": "#12002a" },
-    { "type": "color", "id": "border_color", "label": "Bottom border", "default": "#2a1247" },
+    {
+      "type": "range",
+      "id": "lead_in_width",
+      "label": "Lead-in width",
+      "min": 120,
+      "max": 600,
+      "step": 10,
+      "unit": "px",
+      "default": 300
+    },
+    {
+      "type": "header",
+      "content": "Appearance"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "info": "Leave blank to follow the store theme (light/dark)."
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Bottom border",
+      "info": "Leave blank to follow the store theme (light/dark)."
+    },
     {
       "type": "color",
       "id": "stripe_color",
       "label": "Empty slot stripes",
-      "info": "Must contrast with the background — a dark stripe on a dark bar is invisible.",
-      "default": "#3a2a5c"
+      "info": "Must contrast with the background \u2014 a dark stripe on a dark bar is invisible."
     }
   ],
   "presets": [
     {
       "name": "Birdlabs Ad Marquee",
-      "blocks": [{ "type": "slot" }, { "type": "slot" }]
+      "blocks": [
+        {
+          "type": "slot"
+        },
+        {
+          "type": "slot"
+        }
+      ]
     }
   ]
 }

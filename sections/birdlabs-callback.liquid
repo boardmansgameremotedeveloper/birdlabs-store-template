@@ -38,9 +38,9 @@
   data-section-id="{{ section.id }}"
   data-endpoint="{{ section.settings.callback_endpoint | escape }}"
   style="
-    --cb-bg: {{ section.settings.bg_color }};
-    --cb-fg: {{ section.settings.text_color }};
-    --cb-accent: {{ section.settings.accent_color }};
+    {%- if section.settings.bg_color != blank %}--cb-bg: {{ section.settings.bg_color }};{% endif -%}
+    {%- if section.settings.text_color != blank %}--cb-fg: {{ section.settings.text_color }};{% endif -%}
+    {%- if section.settings.accent_color != blank %}--cb-accent: {{ section.settings.accent_color }};{% endif -%}
   "
 >
   <div class="birdlabs-cb__inner">
@@ -117,8 +117,8 @@
 {% stylesheet %}
   .birdlabs-cb {
     padding: 72px 24px;
-    background: var(--cb-bg, #12002a);
-    color: var(--cb-fg, #f2f4f7);
+    background: var(--cb-bg, var(--bl-surface));
+    color: var(--cb-fg, var(--bl-fg));
   }
 
   .birdlabs-cb__inner {
@@ -132,7 +132,7 @@
 
   .birdlabs-cb__eyebrow {
     margin-bottom: 10px;
-    color: var(--cb-accent, #a78bfa);
+    color: var(--cb-accent, var(--bl-accent));
     font-family: var(--font-body--family);
     font-size: 0.8125rem;
     font-weight: 600;
@@ -172,9 +172,9 @@
 
   .birdlabs-cb__panel {
     padding: 28px;
-    border: 1px solid rgb(255 255 255 / 12%);
+    border: 1px solid var(--bl-border);
     border-radius: 18px;
-    background: rgb(255 255 255 / 6%);
+    background: var(--bl-bg);
     backdrop-filter: blur(8px);
   }
 
@@ -199,18 +199,18 @@
     width: 100%;
     margin-bottom: 16px;
     padding: 12px 14px;
-    border: 1px solid rgb(255 255 255 / 18%);
+    border: 1px solid var(--bl-border);
     border-radius: 10px;
-    background: rgb(0 0 0 / 25%);
+    background: var(--bl-surface);
     color: inherit;
     font-family: var(--font-body--family);
     font-size: 0.9375rem;
   }
 
-  .birdlabs-cb__panel .birdlabs-cb__input { color: var(--cb-fg, #f2f4f7); background: rgb(0 0 0 / 35%); }
-  .birdlabs-cb__panel .birdlabs-cb__input::placeholder { color: var(--cb-fg, #f2f4f7); opacity: 0.45; }
+  .birdlabs-cb__panel .birdlabs-cb__input { color: var(--cb-fg, var(--bl-fg)); background: var(--bl-surface); }
+  .birdlabs-cb__panel .birdlabs-cb__input::placeholder { color: var(--cb-fg, var(--bl-fg)); opacity: 0.5; }
   .birdlabs-cb__panel .birdlabs-cb__input:focus {
-    outline: 2px solid var(--cb-accent, #a78bfa);
+    outline: 2px solid var(--cb-accent, var(--bl-accent));
     outline-offset: 1px;
   }
 
@@ -219,8 +219,8 @@
     padding: 14px 24px;
     border: 0;
     border-radius: 40px;
-    background: var(--cb-accent, #a78bfa);
-    color: #12002a;
+    background: var(--cb-accent, var(--bl-accent));
+    color: var(--bl-on-accent);
     font-family: var(--font-heading--family);
     font-size: 0.9375rem;
     font-weight: 700;
@@ -276,24 +276,64 @@
       "type": "point",
       "name": "Reassurance point",
       "settings": [
-        { "type": "text", "id": "icon", "label": "Icon", "info": "An emoji. Optional." },
-        { "type": "text", "id": "text", "label": "Text", "default": "No obligation, no hard sell" }
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon",
+          "info": "An emoji. Optional."
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "No obligation, no hard sell"
+        }
       ]
     }
   ],
   "settings": [
-    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Talk to a human" },
-    { "type": "text", "id": "heading", "label": "Heading", "default": "Not sure where to start? We'll call you." },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Talk to a human"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Not sure where to start? We'll call you."
+    },
     {
       "type": "textarea",
       "id": "body",
       "label": "Body",
-      "default": "Leave a number and one of our specialists will call you back — usually the same day. Ask anything: what to buy, how to use it, or whether it suits your setup."
+      "default": "Leave a number and one of our specialists will call you back \u2014 usually the same day. Ask anything: what to buy, how to use it, or whether it suits your setup."
     },
-    { "type": "text", "id": "button_label", "label": "Button label", "default": "Request a callback" },
-    { "type": "text", "id": "phone_placeholder", "label": "Phone placeholder", "default": "(555) 123-4567" },
-    { "type": "checkbox", "id": "show_topic", "label": "Ask what it is about", "default": true },
-    { "type": "text", "id": "topic_placeholder", "label": "Topic placeholder", "default": "What would you like to talk through?" },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Request a callback"
+    },
+    {
+      "type": "text",
+      "id": "phone_placeholder",
+      "label": "Phone placeholder",
+      "default": "(555) 123-4567"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_topic",
+      "label": "Ask what it is about",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "topic_placeholder",
+      "label": "Topic placeholder",
+      "default": "What would you like to talk through?"
+    },
     {
       "type": "textarea",
       "id": "reassurance",
@@ -304,27 +344,70 @@
       "type": "text",
       "id": "anchor_id",
       "label": "Anchor ID",
-      "info": "For one-page navigation — \"callback\" makes this reachable at /#callback.",
+      "info": "For one-page navigation \u2014 \"callback\" makes this reachable at /#callback.",
       "default": "callback"
     },
-    { "type": "header", "content": "Live callback service" },
+    {
+      "type": "header",
+      "content": "Live callback service"
+    },
     {
       "type": "paragraph",
-      "content": "Leave this blank and requests are emailed to you through Shopify's contact form — that works immediately with no setup. Enter an endpoint URL only if you run a real callback service (a Twilio backend, for example); the form then posts to it and shows live progress instead."
+      "content": "Leave this blank and requests are emailed to you through Shopify's contact form \u2014 that works immediately with no setup. Enter an endpoint URL only if you run a real callback service (a Twilio backend, for example); the form then posts to it and shows live progress instead."
     },
-    { "type": "url", "id": "callback_endpoint", "label": "Callback endpoint" },
-    { "type": "header", "content": "Colors" },
-    { "type": "color", "id": "bg_color", "label": "Background", "default": "#12002a" },
-    { "type": "color", "id": "text_color", "label": "Text", "default": "#f2f4f7" },
-    { "type": "color", "id": "accent_color", "label": "Accent", "default": "#a78bfa" }
+    {
+      "type": "url",
+      "id": "callback_endpoint",
+      "label": "Callback endpoint"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "info": "Leave blank to follow the store theme (light/dark)."
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "info": "Leave blank to follow the store theme (light/dark)."
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent",
+      "info": "Leave blank to follow the store theme (light/dark)."
+    }
   ],
   "presets": [
     {
       "name": "Birdlabs Callback",
       "blocks": [
-        { "type": "point", "settings": { "icon": "⏱️", "text": "Usually a same-day call back" } },
-        { "type": "point", "settings": { "icon": "🧠", "text": "Straight to someone who knows the products" } },
-        { "type": "point", "settings": { "icon": "🚫", "text": "No obligation, no hard sell" } }
+        {
+          "type": "point",
+          "settings": {
+            "icon": "\u23f1\ufe0f",
+            "text": "Usually a same-day call back"
+          }
+        },
+        {
+          "type": "point",
+          "settings": {
+            "icon": "\ud83e\udde0",
+            "text": "Straight to someone who knows the products"
+          }
+        },
+        {
+          "type": "point",
+          "settings": {
+            "icon": "\ud83d\udeab",
+            "text": "No obligation, no hard sell"
+          }
+        }
       ]
     }
   ]
