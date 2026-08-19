@@ -12,9 +12,9 @@
     "birdlabs_hero2_demo": {
       "type": "birdlabs-custom-hero2",
       "settings": {
-        "eyebrow": "Birdlabs Store Template",
-        "heading_line1": "One page,",
-        "heading_line2": "one store",
+        "eyebrow": "HEMP-DERIVED \u00b7 NANOSIZED THC",
+        "heading_line1": "Elevate your",
+        "heading_line2": "Flight",
         "subtext": "Ported from FLTHQ to Horizon 4.1.4. Everything on this page is a Birdlabs section.",
         "pills": "Free shipping, Easy returns, Made to order",
         "cta_primary_label": "Shop now",
@@ -23,10 +23,24 @@
         "cta_secondary_url": "#story",
         "anchor_id": "home",
         "section_height": 100,
-        "show_bg_images": false,
+        "show_bg_images": true,
         "bg_color": "#dceefb",
         "show_clouds": true,
-        "show_announcement": false
+        "show_announcement": false,
+        "bg_image_1": "shopify://shop_images/hero_background_pexels-ingewallu-122110_a3c90111-fbca-4d77-a53e-c18c3a1cc56b.jpg",
+        "bg_image_2": "shopify://shop_images/hero_background_pexels-eduardolimabrport-4006600.jpg",
+        "bg_image_3": "shopify://shop_images/hero_background_pexels-stevecormie-33337421.jpg",
+        "show_drift": true,
+        "drift_shape": "flower",
+        "drift_count": 18,
+        "drift_size": 48,
+        "drift_opacity": 70,
+        "drift_color": "#ffffff",
+        "drift_glow": "#87ceeb",
+        "show_body_bg": true,
+        "body_bg_color": "#ffffff",
+        "body_bg_border": "thin",
+        "body_text_color": "#0b2545"
       }
     },
     "birdlabs_products_demo": {

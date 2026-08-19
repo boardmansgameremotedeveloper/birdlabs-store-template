@@ -77,6 +77,17 @@
     </div>
   {%- endif -%}
 
+  {%- if section.settings.show_drift -%}
+    {%- render 'birdlabs-drift-particles',
+      count: section.settings.drift_count,
+      size: section.settings.drift_size,
+      shape: section.settings.drift_shape,
+      color: section.settings.drift_color,
+      opacity: section.settings.drift_opacity,
+      glow: section.settings.drift_glow
+    -%}
+  {%- endif -%}
+
   {%- if section.settings.show_clouds -%}
     <div class="birdlabs-hero2__clouds" aria-hidden="true">
       <div class="birdlabs-hero2__cloud" style="top:12%;left:5%;width:280px;height:70px;filter:blur(30px);transition-delay:.5s;"></div>
@@ -243,6 +254,43 @@
   }
 
   .birdlabs-hero2--loaded .birdlabs-hero2__cloud { opacity: 1; }
+
+  /*
+   * Drift particles (snippets/birdlabs-drift-particles.liquid). The snippet emits markup
+   * only; these rules belong to the consuming section so Horizon can aggregate and cache
+   * them rather than re-emitting a <style> tag per render.
+   */
+  .birdlabs-drift {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  @keyframes birdlabs-drift-across {
+    0% { translate: calc(100vw + 60px) 0; opacity: 0; }
+    8% { opacity: var(--bd-opacity, 0.7); }
+    85% { opacity: calc(var(--bd-opacity, 0.7) * 0.7); }
+    96% { opacity: 0; }
+    100% { translate: -60px 0; opacity: 0; }
+  }
+
+  .birdlabs-drift__item {
+    position: absolute;
+    display: block;
+    width: var(--bd-size, 48px);
+    height: var(--bd-size, 48px);
+    /* `translate` carries the drift so the inline `transform: scale()` survives it. */
+    animation: birdlabs-drift-across linear infinite;
+    filter:
+      drop-shadow(0 0 8px rgb(255 255 255 / 90%))
+      drop-shadow(0 0 20px var(--bd-glow, #87ceeb));
+  }
+
+  @media (max-width: 768px) {
+    .birdlabs-drift__item { width: calc(var(--bd-size, 48px) * 0.7); height: calc(var(--bd-size, 48px) * 0.7); }
+  }
 
   .birdlabs-hero2__content {
     position: relative;
@@ -425,6 +473,8 @@
     .birdlabs-hero2__bg-slide { animation: none; }
     .birdlabs-hero2__bg-slide--1 { opacity: 1; }
     .birdlabs-hero2__cloud { transition: none; opacity: 1; }
+    /* An endless drift is precisely what reduced-motion asks to be spared. */
+    .birdlabs-drift { display: none; }
     .birdlabs-hero2__content > * {
       opacity: 1;
       transform: none;
@@ -560,6 +610,30 @@
       "label": "Show soft cloud layer",
       "default": true
     },
+    { "type": "header", "content": "Drifting particles" },
+    {
+      "type": "checkbox",
+      "id": "show_drift",
+      "label": "Show drifting particles",
+      "info": "Geometric motes that drift across the hero. Hidden for visitors who prefer reduced motion.",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "drift_shape",
+      "label": "Particle shape",
+      "default": "flower",
+      "options": [
+        { "value": "flower", "label": "Flower of life" },
+        { "value": "snowflake", "label": "Snowflake" },
+        { "value": "hexagon", "label": "Hexagon" }
+      ]
+    },
+    { "type": "range", "id": "drift_count", "label": "How many", "min": 4, "max": 40, "step": 2, "default": 18 },
+    { "type": "range", "id": "drift_size", "label": "Size", "min": 16, "max": 96, "step": 4, "unit": "px", "default": 48 },
+    { "type": "range", "id": "drift_opacity", "label": "Opacity", "min": 10, "max": 100, "step": 5, "unit": "%", "default": 70 },
+    { "type": "color", "id": "drift_color", "label": "Particle color", "default": "#ffffff" },
+    { "type": "color", "id": "drift_glow", "label": "Glow color", "default": "#87ceeb" },
     {
       "type": "header",
       "content": "Colors"
