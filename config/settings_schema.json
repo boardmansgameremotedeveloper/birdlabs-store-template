@@ -2116,5 +2116,32 @@
         "default": "equal-width-buttons"
       }
     ]
+  },
+  {
+    "name": "Birdlabs dark theme",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Colors used when a shopper switches the storefront to dark. Shopify's own palette is merchant-facing only, so these fill the gap."
+      },
+      {
+        "type": "color",
+        "id": "birdlabs_dark_background",
+        "label": "Dark background",
+        "default": "#111318"
+      },
+      {
+        "type": "color",
+        "id": "birdlabs_dark_foreground",
+        "label": "Dark text",
+        "default": "#f2f4f7"
+      },
+      {
+        "type": "color",
+        "id": "birdlabs_dark_border",
+        "label": "Dark border",
+        "default": "#2a2f3a"
+      }
+    ]
   }
 ]

@@ -1,0 +1,84 @@
+{% comment %}
+  snippets/birdlabs-theme-tokens.liquid
+
+  Visitor-facing light/dark switching for Horizon.
+
+  WHY THIS IS NEEDED. Shopify's colour system is merchant-facing only: the merchant picks a
+  palette, and every visitor gets it. There is no built-in "dark mode" a shopper can switch to,
+  because Horizon computes --color-background / --color-foreground / --color-border once from
+  `settings.color_palette` and that is the end of it.
+
+  WHAT THIS DOES. It re-declares those same tokens under `[data-birdlabs-theme='dark']` on the
+  root element. Because every Horizon section reads the tokens rather than hard-coded colours,
+  overriding them at the root flips the whole storefront — stock sections included — without
+  touching a single Shopify file.
+
+  The dark values are merchant-editable, so a store is not stuck with someone else's idea of
+  dark. Defaults are a neutral near-black with a soft off-white, which reads well against most
+  brand accents.
+
+  Usage: {% render 'birdlabs-theme-tokens' %} — once per page, from the header section.
+{% endcomment %}
+
+{%- liquid
+  assign d_bg = settings.birdlabs_dark_background | default: '#111318'
+  assign d_fg = settings.birdlabs_dark_foreground | default: '#f2f4f7'
+  assign d_border = settings.birdlabs_dark_border | default: '#2a2f3a'
+-%}
+
+<style>
+  [data-birdlabs-theme='dark'] {
+    --color-background: {{ d_bg }};
+    --color-background-rgb: {{ d_bg.rgb }};
+    --color-foreground: {{ d_fg }};
+    --color-foreground-rgb: {{ d_fg.rgb }};
+    --color-foreground-muted: {{ d_fg | color_modify: 'alpha', 0.72 }};
+    --color-foreground-subdued: {{ d_fg | color_modify: 'alpha', 0.55 }};
+    --color-border: {{ d_border }};
+    --color-border-rgb: {{ d_border.rgb }};
+    --color-input-background: {{ d_bg | color_lighten: 6 }};
+    --color-input-border: {{ d_border }};
+    --color-input-text: {{ d_fg }};
+    --color-input-text-rgb: {{ d_fg.rgb }};
+    color-scheme: dark;
+  }
+
+  /* Images and media are usually shot on light backgrounds; a slight knock-down stops them
+     glaring against a dark page without washing out the colour. */
+  [data-birdlabs-theme='dark'] img:not([src$='.svg']) { filter: brightness(0.94); }
+
+  .birdlabs-theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .birdlabs-theme-toggle svg { width: 18px; height: 18px; }
+  .birdlabs-theme-toggle__moon { display: none; }
+  [data-birdlabs-theme='dark'] .birdlabs-theme-toggle__sun { display: none; }
+  [data-birdlabs-theme='dark'] .birdlabs-theme-toggle__moon { display: block; }
+</style>
+
+<script>
+  /* Runs before first paint so a returning visitor's choice is applied without a flash of
+     the wrong theme. Deliberately inline and tiny for that reason. */
+  (function () {
+    try {
+      var saved = localStorage.getItem('birdlabs-theme');
+      var dark = saved
+        ? saved === 'dark'
+        : window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (dark) document.documentElement.setAttribute('data-birdlabs-theme', 'dark');
+    } catch (e) {
+      /* private mode: fall through to the merchant's palette */
+    }
+  })();
+</script>
