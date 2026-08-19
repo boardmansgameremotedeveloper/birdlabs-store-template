@@ -1,0 +1,423 @@
+{% comment %}
+  sections/birdlabs-scoop-analysis.liquid
+
+  "Inside every scoop" — a periodic-table style grid of trace minerals, plus a collapsible
+  Guaranteed Analysis table.
+
+  Ported from buyflorabella's MineralComposition.tsx and GuaranteedAnalysis.tsx.
+
+  Three deliberate changes on the way into Liquid:
+
+  1. **The collapsible is a native <details>/<summary>.** The source drives it with React
+     useState. `<details>` needs no JavaScript at all, is keyboard operable and screen-reader
+     announced for free, and still works if scripts fail. Less code and more accessible.
+
+  2. **The analysis rows are a real <table>.** The source lays them out as flex rows, which
+     reads to a screen reader as an undifferentiated list. A guaranteed analysis IS tabular
+     data — element, symbol, percentage — and marking it up as a table is both more correct
+     and easier for a merchant to scan in the editor.
+
+  3. **Minerals and analysis rows are BLOCKS.** In the source both are hard-coded arrays, so
+     changing a percentage means a developer and a deploy. A guaranteed analysis changes with
+     the formulation and is exactly the kind of content a merchant must be able to edit
+     themselves.
+
+  Colours follow the theme palette; leave a colour setting blank and it inherits light/dark.
+{% endcomment %}
+
+{%- liquid
+  assign anchor = section.settings.anchor_id | strip | handleize
+  if anchor == blank
+    assign anchor = 'birdlabs-scoop-' | append: section.id
+  endif
+  assign minerals = section.blocks | where: 'type', 'mineral'
+  assign rows = section.blocks | where: 'type', 'analysis'
+-%}
+
+<section
+  id="{{ anchor }}"
+  class="birdlabs-scoop"
+  data-section-id="{{ section.id }}"
+  style="
+    {%- if section.settings.bg_color != blank %}--sc-bg: {{ section.settings.bg_color }};{% endif -%}
+    {%- if section.settings.accent_color != blank %}--sc-accent: {{ section.settings.accent_color }};{% endif -%}
+  "
+>
+  <div class="birdlabs-scoop__inner">
+    <div class="birdlabs-scoop__head birdlabs-reveal">
+      {%- if section.settings.eyebrow != blank -%}
+        <span class="birdlabs-scoop__eyebrow">{{ section.settings.eyebrow | escape }}</span>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="birdlabs-scoop__heading">{{ section.settings.heading | escape }}</h2>
+      {%- endif -%}
+      {%- if section.settings.body != blank -%}
+        <p class="birdlabs-scoop__body">{{ section.settings.body | escape }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- if minerals.size > 0 -%}
+      <ul class="birdlabs-scoop__grid">
+        {%- for block in minerals -%}
+          <li class="birdlabs-scoop__tile birdlabs-reveal" {{ block.shopify_attributes }}>
+            <div class="birdlabs-scoop__tile-head">
+              {%- if block.settings.number != blank -%}
+                <span class="birdlabs-scoop__num">{{ block.settings.number | escape }}</span>
+              {%- endif -%}
+              <span class="birdlabs-scoop__symbol">{{ block.settings.symbol | escape }}</span>
+              <span class="birdlabs-scoop__name">{{ block.settings.name | escape }}</span>
+            </div>
+            {%- if block.settings.benefit != blank -%}
+              <p class="birdlabs-scoop__benefit">{{ block.settings.benefit | escape }}</p>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+
+    {%- if rows.size > 0 -%}
+      {%- comment -%}
+        Native <details>: no JavaScript, keyboard operable and announced by screen readers
+        without any ARIA of our own.
+      {%- endcomment -%}
+      <details class="birdlabs-scoop__ga"{% if section.settings.ga_open %} open{% endif %}>
+        <summary class="birdlabs-scoop__ga-summary">
+          <span class="birdlabs-scoop__ga-icon" aria-hidden="true">%</span>
+          <span class="birdlabs-scoop__ga-titles">
+            <span class="birdlabs-scoop__ga-title">{{ section.settings.ga_title | escape }}</span>
+            <span class="birdlabs-scoop__ga-sub">{{ section.settings.ga_subtitle | escape }}</span>
+          </span>
+          <svg class="birdlabs-scoop__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </summary>
+
+        <div class="birdlabs-scoop__ga-body">
+          <table class="birdlabs-scoop__table">
+            <caption class="visually-hidden">{{ section.settings.ga_title | escape }}</caption>
+            <thead>
+              <tr>
+                <th scope="col">Element</th>
+                <th scope="col">Symbol</th>
+                <th scope="col" class="birdlabs-scoop__num-col">Percent</th>
+              </tr>
+            </thead>
+            <tbody>
+              {%- for block in rows -%}
+                <tr {{ block.shopify_attributes }}>
+                  <td>{{ block.settings.element | escape }}</td>
+                  <td class="birdlabs-scoop__sym-cell">{{ block.settings.symbol | escape }}</td>
+                  <td class="birdlabs-scoop__num-col">{{ block.settings.percentage | escape }}</td>
+                </tr>
+              {%- endfor -%}
+            </tbody>
+          </table>
+
+          {%- if section.settings.ga_footnote != blank -%}
+            <p class="birdlabs-scoop__foot">{{ section.settings.ga_footnote | escape }}</p>
+          {%- endif -%}
+        </div>
+      </details>
+    {%- endif -%}
+  </div>
+</section>
+
+<script src="{{ 'birdlabs-reveal.js' | asset_url }}" defer></script>
+
+{% stylesheet %}
+  .birdlabs-scoop {
+    padding: 96px 24px;
+    background: var(--sc-bg, var(--bl-bg));
+    color: var(--bl-fg);
+  }
+
+  .birdlabs-scoop__inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .birdlabs-scoop__head {
+    margin-bottom: 48px;
+    text-align: center;
+  }
+
+  .birdlabs-scoop__eyebrow {
+    display: inline-block;
+    margin-bottom: 14px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    background: color-mix(in srgb, var(--sc-accent, var(--bl-accent)) 14%, transparent);
+    color: var(--sc-accent, var(--bl-accent));
+    font-family: var(--font-body--family);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .birdlabs-scoop__heading {
+    margin: 0 0 14px;
+    font-family: var(--font-heading--family);
+    font-size: clamp(2rem, 4.5vw, 3.25rem);
+    font-weight: 800;
+    line-height: 1.08;
+  }
+
+  .birdlabs-scoop__body {
+    max-width: 60ch;
+    margin: 0 auto;
+    font-family: var(--font-body--family);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    opacity: 0.8;
+  }
+
+  .birdlabs-scoop__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 16px;
+    margin: 0 0 44px;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Periodic-table tile: atomic number top-right, symbol large, name beneath. */
+  .birdlabs-scoop__tile {
+    padding: 18px;
+    border: 1px solid var(--bl-border);
+    border-radius: 14px;
+    background: var(--bl-surface);
+  }
+
+  .birdlabs-scoop__tile-head {
+    position: relative;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  .birdlabs-scoop__num {
+    position: absolute;
+    top: 0;
+    right: 0;
+    color: var(--sc-accent, var(--bl-accent));
+    font-family: var(--font-body--family);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    opacity: 0.6;
+  }
+
+  .birdlabs-scoop__symbol {
+    display: block;
+    color: var(--sc-accent, var(--bl-accent));
+    font-family: var(--font-heading--family);
+    font-size: 2.25rem;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+
+  .birdlabs-scoop__name {
+    display: block;
+    font-family: var(--font-body--family);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    opacity: 0.75;
+  }
+
+  .birdlabs-scoop__benefit {
+    margin: 0;
+    font-family: var(--font-body--family);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    text-align: center;
+    opacity: 0.72;
+  }
+
+  /* ── Guaranteed analysis ── */
+  .birdlabs-scoop__ga {
+    max-width: 640px;
+    margin: 0 auto;
+    overflow: hidden;
+    border: 1px solid var(--bl-border);
+    border-radius: 16px;
+    background: var(--bl-surface);
+  }
+
+  .birdlabs-scoop__ga-summary {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    background: var(--sc-accent, var(--bl-accent));
+    color: var(--bl-on-accent);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .birdlabs-scoop__ga-summary::-webkit-details-marker { display: none; }
+
+  .birdlabs-scoop__ga-icon {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgb(255 255 255 / 22%);
+    font-family: var(--font-heading--family);
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  .birdlabs-scoop__ga-titles { flex: 1 1 auto; }
+
+  .birdlabs-scoop__ga-title {
+    display: block;
+    font-family: var(--font-heading--family);
+    font-size: 1.0625rem;
+    font-weight: 700;
+  }
+
+  .birdlabs-scoop__ga-sub {
+    display: block;
+    font-family: var(--font-body--family);
+    font-size: 0.75rem;
+    opacity: 0.8;
+  }
+
+  .birdlabs-scoop__chev {
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+    transition: rotate 0.25s ease;
+  }
+
+  .birdlabs-scoop__ga[open] .birdlabs-scoop__chev { rotate: 180deg; }
+
+  .birdlabs-scoop__ga-body { padding: 8px 20px 18px; }
+
+  .birdlabs-scoop__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-body--family);
+    font-size: 0.875rem;
+  }
+
+  .birdlabs-scoop__table th {
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--bl-border);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-align: left;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+
+  .birdlabs-scoop__table td {
+    padding: 9px 8px;
+    border-bottom: 1px solid color-mix(in srgb, var(--bl-border) 55%, transparent);
+  }
+
+  .birdlabs-scoop__table tr:last-child td { border-bottom: 0; }
+
+  .birdlabs-scoop__sym-cell {
+    color: var(--sc-accent, var(--bl-accent));
+    font-weight: 700;
+  }
+
+  /* Tabular figures so the decimal points line up down the column. */
+  .birdlabs-scoop__num-col {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .birdlabs-scoop__foot {
+    margin: 14px 0 0;
+    font-family: var(--font-body--family);
+    font-size: 0.75rem;
+    text-align: center;
+    opacity: 0.6;
+  }
+
+  @media (max-width: 749px) {
+    .birdlabs-scoop { padding: 64px 20px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .birdlabs-scoop__chev { transition: none; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Birdlabs Scoop Analysis",
+  "tag": "section",
+  "class": "birdlabs-scoop-wrapper",
+  "max_blocks": 40,
+  "blocks": [
+    {
+      "type": "mineral",
+      "name": "Mineral tile",
+      "settings": [
+        { "type": "text", "id": "symbol", "label": "Symbol", "default": "Mg" },
+        { "type": "text", "id": "name", "label": "Name", "default": "Magnesium" },
+        { "type": "text", "id": "number", "label": "Atomic number", "default": "12" },
+        { "type": "textarea", "id": "benefit", "label": "What it does" }
+      ]
+    },
+    {
+      "type": "analysis",
+      "name": "Analysis row",
+      "settings": [
+        { "type": "text", "id": "element", "label": "Element", "default": "Calcium" },
+        { "type": "text", "id": "symbol", "label": "Symbol", "default": "Ca" },
+        { "type": "text", "id": "percentage", "label": "Percent", "default": "0.00%" }
+      ]
+    }
+  ],
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "70+ trace minerals" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Inside every scoop" },
+    {
+      "type": "textarea",
+      "id": "body",
+      "label": "Body",
+      "default": "A broad spectrum of naturally occurring trace minerals — the elements soil biology needs to unlock what is already in your ground."
+    },
+    { "type": "header", "content": "Guaranteed analysis" },
+    { "type": "text", "id": "ga_title", "label": "Panel title", "default": "Guaranteed analysis" },
+    { "type": "text", "id": "ga_subtitle", "label": "Panel subtitle", "default": "View mineral percentages" },
+    { "type": "checkbox", "id": "ga_open", "label": "Open by default", "default": false },
+    {
+      "type": "text",
+      "id": "ga_footnote",
+      "label": "Footnote",
+      "default": "Minimum percentages by weight · Lab tested"
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "info": "For one-page navigation — \"analysis\" makes this reachable at /#analysis.",
+      "default": "analysis"
+    },
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "bg_color", "label": "Background", "info": "Leave blank to follow the store theme (light/dark)." },
+    { "type": "color", "id": "accent_color", "label": "Accent", "info": "Leave blank to follow the store theme (light/dark)." }
+  ],
+  "presets": [
+    {
+      "name": "Birdlabs Scoop Analysis",
+      "blocks": [
+        { "type": "mineral", "settings": { "symbol": "Mg", "name": "Magnesium", "number": "12" } },
+        { "type": "mineral", "settings": { "symbol": "Fe", "name": "Iron", "number": "26" } },
+        { "type": "mineral", "settings": { "symbol": "Zn", "name": "Zinc", "number": "30" } },
+        { "type": "analysis", "settings": { "element": "Calcium", "symbol": "Ca", "percentage": "1.40%" } },
+        { "type": "analysis", "settings": { "element": "Magnesium", "symbol": "Mg", "percentage": "1.40%" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

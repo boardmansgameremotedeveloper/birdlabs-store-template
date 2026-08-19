@@ -6,7 +6,8 @@
  * or related systems. Please exercise caution as any changes
  * made to this file may be overwritten.
  * ------------------------------------------------------------
- */{
+ */
+{
   "sections": {
     "main": {
       "type": "product-information",
@@ -465,10 +466,78 @@
         "padding-block-start": 48,
         "padding-block-end": 48
       }
+    },
+    "birdlabs_details": {
+      "type": "birdlabs-product-details",
+      "blocks": {
+        "t1": {
+          "type": "trust",
+          "settings": {
+            "icon": "\u2705",
+            "title": "Quality sourced",
+            "subtitle": "Carefully selected inputs"
+          }
+        },
+        "t2": {
+          "type": "trust",
+          "settings": {
+            "icon": "\ud83d\udd01",
+            "title": "Consistent supply",
+            "subtitle": "Reliable, repeatable fulfilment"
+          }
+        },
+        "t3": {
+          "type": "trust",
+          "settings": {
+            "icon": "\ud83d\udd12",
+            "title": "Secure payment",
+            "subtitle": "SSL encrypted"
+          }
+        },
+        "b1": {
+          "type": "tab",
+          "settings": {
+            "label": "Overview",
+            "heading": "Product overview",
+            "namespace": "custom",
+            "key": "product_overview",
+            "render_as": "rich"
+          }
+        },
+        "b2": {
+          "type": "tab",
+          "settings": {
+            "label": "Key benefits",
+            "heading": "Key benefits",
+            "namespace": "custom",
+            "key": "key_benefits",
+            "render_as": "list"
+          }
+        },
+        "b3": {
+          "type": "tab",
+          "settings": {
+            "label": "How to use",
+            "heading": "How to use",
+            "namespace": "custom",
+            "key": "how_to_use",
+            "render_as": "rich"
+          }
+        }
+      },
+      "block_order": [
+        "t1",
+        "t2",
+        "t3",
+        "b1",
+        "b2",
+        "b3"
+      ]
     }
   },
   "order": [
     "main",
+    "birdlabs_details",
     "product_recommendations_qggXJq"
   ]
 }

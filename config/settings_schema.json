@@ -2116,5 +2116,62 @@
         "default": "equal-width-buttons"
       }
     ]
+  },
+  {
+    "name": "Birdlabs dark theme",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "LIGHT theme uses Shopify's own colour palette above \u2014 edit it under Colors and every section follows. These settings exist only because Shopify has no native dark palette; they override the same variables when a shopper switches to dark."
+      },
+      {
+        "type": "color",
+        "id": "bl_dark_bg",
+        "label": "Background",
+        "default": "#1a0b2e"
+      },
+      {
+        "type": "color",
+        "id": "bl_dark_surface",
+        "label": "Surface / panel",
+        "default": "#2a1546"
+      },
+      {
+        "type": "color",
+        "id": "bl_dark_fg",
+        "label": "Text",
+        "default": "#f7edff"
+      },
+      {
+        "type": "color",
+        "id": "bl_dark_muted",
+        "label": "Muted text",
+        "default": "#bda6d6"
+      },
+      {
+        "type": "color",
+        "id": "bl_dark_border",
+        "label": "Border",
+        "default": "#3f2766"
+      },
+      {
+        "type": "color",
+        "id": "bl_dark_accent",
+        "label": "Accent",
+        "default": "#ffd93d"
+      },
+      {
+        "type": "color",
+        "id": "bl_dark_on_accent",
+        "label": "Text on accent",
+        "default": "#2a1546"
+      },
+      {
+        "type": "color",
+        "id": "bl_dark_accent_2",
+        "label": "Secondary accent",
+        "default": "#ff5fa2"
+      }
+    ]
   }
 ]

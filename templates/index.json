@@ -9,361 +9,560 @@
  */
 {
   "sections": {
-    "birdlabs_custom_hero1_Px4Rke": {
-      "type": "birdlabs-custom-hero1",
+    "birdlabs_products_demo": {
+      "type": "birdlabs-products-1",
+      "settings": {
+        "eyebrow": "The collection",
+        "title": "Our products",
+        "anchor_id": "products",
+        "show_filters": true,
+        "all_label": "All products",
+        "products_shown": 24,
+        "source_collection": "demo-buyflorabella",
+        "category_source": "tags",
+        "tag_prefix": "cat:"
+      }
+    },
+    "birdlabs_story_demo": {
+      "type": "birdlabs-story-1",
       "blocks": {
-        "text_4Wni8Q": {
-          "type": "text",
+        "b1": {
+          "type": "beat",
           "settings": {
-            "text": "<h2>New arrivals</h2>",
-            "width": "fit-content",
-            "max_width": "narrow",
-            "alignment": "left",
-            "type_preset": "h1",
-            "font": "var(--font-body--family)",
-            "font_size": "1rem",
-            "line_height": "normal",
-            "letter_spacing": "normal",
-            "case": "none",
-            "wrap": "pretty",
-            "text_color": "",
-            "background": false,
-            "background_color": "#00000026",
-            "corner_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {}
+            "title": "Where it started",
+            "body": "A short paragraph about the beginning."
+          }
         },
-        "text_iXyD3r": {
-          "type": "text",
+        "b2": {
+          "type": "beat",
           "settings": {
-            "text": "<p>Made with care and unconditionally loved by our customers.</p>",
-            "width": "fit-content",
-            "max_width": "narrow",
-            "alignment": "left",
-            "type_preset": "rte",
-            "font": "var(--font-body--family)",
-            "font_size": "1rem",
-            "line_height": "normal",
-            "letter_spacing": "normal",
-            "case": "none",
-            "wrap": "pretty",
-            "text_color": "",
-            "background": false,
-            "background_color": "#00000026",
-            "corner_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 32,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {}
+            "title": "What we learned",
+            "body": "A short paragraph about the middle."
+          }
         },
-        "button_iDxyBe": {
-          "type": "button",
-          "name": "t:names.button",
+        "b3": {
+          "type": "beat",
           "settings": {
-            "label": "Shop now",
-            "link": "shopify://collections/all",
-            "open_in_new_tab": false,
-            "style_class": "button",
-            "custom_button_background": "{{ settings.color_palette.foreground }}",
-            "custom_button_text": "{{ settings.color_palette.background }}",
-            "custom_button_border": "{{ settings.color_palette.background }}",
-            "link_text_color": "",
-            "width": "fit-content",
-            "custom_width": 100,
-            "width_mobile": "fit-content",
-            "custom_width_mobile": 100
-          },
-          "blocks": {}
+            "title": "How we build",
+            "body": "A short paragraph about the craft."
+          }
+        },
+        "b4": {
+          "type": "beat",
+          "settings": {
+            "title": "Where we're going",
+            "body": "A short paragraph about what's next."
+          }
         }
       },
       "block_order": [
-        "text_4Wni8Q",
-        "text_iXyD3r",
-        "button_iDxyBe"
+        "b1",
+        "b2",
+        "b3",
+        "b4"
       ],
-      "name": "Birdlabs Custom Hero 1",
       "settings": {
-        "birdlabs_eyebrow": "BIRD LABS",
-        "media_type_1": "image",
-        "media_type_2": "image",
-        "stack_media_on_mobile": false,
-        "custom_mobile_media": false,
-        "media_type_1_mobile": "image",
-        "media_type_2_mobile": "image",
-        "link": "",
-        "open_in_new_tab": false,
-        "content_direction": "column",
-        "vertical_on_mobile": true,
-        "horizontal_alignment": "flex-start",
-        "vertical_alignment": "center",
-        "align_baseline": false,
-        "horizontal_alignment_flex_direction_column": "center",
-        "vertical_alignment_flex_direction_column": "center",
-        "gap": 16,
-        "section_width": "page-width",
-        "section_height": "large",
-        "section_height_custom": 50,
-        "background_color": "",
-        "toggle_overlay": true,
-        "overlay_color": "#00000026",
-        "overlay_style": "gradient",
-        "gradient_direction": "to top",
-        "blurred_reflection": false,
-        "reflection_opacity": 75,
-        "padding-block-start": 40,
-        "padding-block-end": 40
+        "eyebrow": "Our story",
+        "heading": "How we got here",
+        "anchor_id": "story",
+        "mission_text": "A pull-quote that sums up why the store exists.",
+        "cta_label": "Read more",
+        "cta_url": "/pages/our-story"
       }
     },
-    "marquee_MY8TjJ": {
-      "type": "marquee",
+    "birdlabs_contact_demo": {
+      "type": "birdlabs-contact-1",
       "blocks": {
-        "text_zUhYLd": {
-          "type": "text",
+        "c1": {
+          "type": "info",
           "settings": {
-            "text": "<p>BIRD Labs LLC</p>",
-            "width": "fit-content",
-            "max_width": "normal",
-            "alignment": "left",
-            "type_preset": "custom",
-            "font": "var(--font-body--family)",
-            "font_size": "1rem",
-            "line_height": "tight",
-            "letter_spacing": "tight",
-            "case": "none",
-            "wrap": "nowrap",
-            "text_color": "",
-            "background": false,
-            "background_color": "#00000026",
-            "corner_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {}
+            "icon": "\ud83d\udccd",
+            "label": "Address",
+            "value": "123 Example St"
+          }
+        },
+        "c2": {
+          "type": "info",
+          "settings": {
+            "icon": "\u2709\ufe0f",
+            "label": "Email",
+            "value": "hello@example.com"
+          }
+        },
+        "c3": {
+          "type": "info",
+          "settings": {
+            "icon": "\ud83d\udcf1",
+            "label": "Phone",
+            "value": "+1 555 0100"
+          }
+        },
+        "t1": {
+          "type": "trust",
+          "settings": {
+            "badge_text": "AUTH NET",
+            "name": "Secure payments by Authorize.net",
+            "detail": "All transactions encrypted with 128-bit SSL. Visa and Mastercard accepted."
+          }
         }
       },
       "block_order": [
-        "text_zUhYLd"
+        "t1",
+        "c1",
+        "c2",
+        "c3"
       ],
-      "name": "t:names.marquee_section",
       "settings": {
-        "movement_direction": "normal",
-        "background_color": "",
-        "padding-block-start": 24,
-        "padding-block-end": 24,
-        "gap_between_elements": 24
+        "eyebrow": "Contact",
+        "heading": "Get in touch",
+        "anchor_id": "contact"
       }
     },
-    "product_list_fa6P9H": {
-      "type": "product-list",
+    "birdlabs_reels_demo": {
+      "type": "birdlabs-video-reels",
       "blocks": {
-        "static-header": {
-          "type": "_product-list-content",
-          "name": "t:names.header",
-          "static": true,
+        "r1": {
+          "type": "reel",
           "settings": {
-            "content_direction": "row",
-            "vertical_on_mobile": false,
-            "horizontal_alignment": "space-between",
-            "vertical_alignment": "flex-end",
-            "align_baseline": true,
-            "horizontal_alignment_flex_direction_column": "flex-start",
-            "vertical_alignment_flex_direction_column": "center",
-            "gap": 12,
-            "width": "fill",
-            "custom_width": 100,
-            "width_mobile": "fill",
-            "custom_width_mobile": 100,
-            "height": "fit",
-            "custom_height": 100,
-            "background_media": "none",
-            "background_color": "",
-            "video_position": "cover",
-            "background_image_position": "cover",
-            "border": "none",
-            "border_width": 1,
-            "border_opacity": 100,
-            "border_color": "",
-            "border_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {
-            "product_list_text_YFtzcL": {
-              "type": "_product-list-text",
-              "name": "t:names.collection_title",
-              "settings": {
-                "text": "<h3>{{ closest.collection.title }}</h3>",
-                "width": "fit-content",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "h4",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "text_color": "",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "product_list_button_MWeP9V": {
-              "type": "_product-list-button",
-              "name": "t:names.product_list_button",
-              "settings": {
-                "label": "View all",
-                "open_in_new_tab": false,
-                "style_class": "link",
-                "custom_button_background": "{{ settings.color_palette.foreground }}",
-                "custom_button_text": "{{ settings.color_palette.background }}",
-                "custom_button_border": "{{ settings.color_palette.background }}",
-                "link_text_color": "",
-                "width": "fit-content",
-                "custom_width": 100,
-                "width_mobile": "fit-content",
-                "custom_width_mobile": 100
-              },
-              "blocks": {}
-            }
-          },
-          "block_order": [
-            "product_list_text_YFtzcL",
-            "product_list_button_MWeP9V"
-          ]
+            "title": "How To Mix Flora Bella",
+            "video_id": "-SFmEtrPzd0",
+            "platform": "YouTube"
+          }
         },
-        "static-product-card": {
-          "type": "_product-card",
-          "name": "t:names.product_card",
-          "static": true,
+        "r2": {
+          "type": "reel",
           "settings": {
-            "product_card_gap": 4,
-            "background_color": "",
-            "border": "none",
-            "border_width": 1,
-            "border_opacity": 100,
-            "border_color": "",
-            "border_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {
-            "product_card_gallery_677WP3": {
-              "type": "_product-card-gallery",
-              "name": "t:names.product_card_media",
-              "settings": {
-                "image_ratio": "adapt",
-                "border": "none",
-                "border_width": 1,
-                "border_opacity": 100,
-                "border_color": "",
-                "border_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "product_title_YXxMTj": {
-              "type": "product-title",
-              "name": "t:names.product_title",
-              "settings": {
-                "width": "100%",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "rte",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "text_color": "",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 4,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "price_JQzVV4": {
-              "type": "price",
-              "name": "t:names.product_price",
-              "settings": {
-                "show_sale_price_first": true,
-                "show_installments": false,
-                "show_tax_info": false,
-                "type_preset": "h6",
-                "width": "100%",
-                "alignment": "left",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "text_color": "",
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            }
-          },
-          "block_order": [
-            "product_card_gallery_677WP3",
-            "product_title_YXxMTj",
-            "price_JQzVV4"
-          ]
+            "title": "Compost Tea Mix",
+            "video_id": "3L2qpacas2s",
+            "platform": "YouTube"
+          }
+        },
+        "r3": {
+          "type": "reel",
+          "settings": {
+            "title": "Trace Minerals",
+            "video_id": "ZjHmtGw0ZqA",
+            "platform": "YouTube"
+          }
+        },
+        "r4": {
+          "type": "reel",
+          "settings": {
+            "title": "Waterfall Scene",
+            "video_id": "MdAHWVib7Kk",
+            "platform": "YouTube"
+          }
         }
       },
-      "name": "t:names.product_list",
+      "block_order": [
+        "r1",
+        "r2",
+        "r3",
+        "r4"
+      ],
       "settings": {
-        "collection": "all",
-        "layout_type": "grid",
-        "carousel_on_mobile": false,
-        "max_products": 8,
-        "columns": 4,
-        "mobile_columns": "2",
-        "mobile_card_size": "60cqw",
-        "columns_gap": 8,
-        "rows_gap": 24,
-        "icons_style": "arrow",
-        "icons_shape": "none",
-        "section_width": "page-width",
-        "horizontal_alignment": "flex-start",
-        "gap": 28,
-        "background_color": "{{ settings.color_palette.background }}",
-        "padding-block-start": 48,
-        "padding-block-end": 48
+        "eyebrow": "Watch",
+        "heading": "See it in action",
+        "anchor_id": "videos",
+        "privacy_mode": true,
+        "bg_color": "",
+        "texture": "weave"
+      }
+    },
+    "birdlabs_admq": {
+      "type": "birdlabs-ad-marquee",
+      "blocks": {
+        "s1": {
+          "type": "slot",
+          "settings": {
+            "image": "shopify://shop_images/advertise-here-1.png",
+            "link": "/pages/contact",
+            "alt": "Advertise here \u2014 this ad slot is available"
+          }
+        },
+        "s2": {
+          "type": "slot",
+          "settings": {
+            "image": "shopify://shop_images/advertise-here-2.png",
+            "link": "/pages/contact",
+            "alt": "Advertise here \u2014 this ad slot is available"
+          }
+        },
+        "s3": {
+          "type": "slot",
+          "settings": {
+            "image": "shopify://shop_images/advertise-here-3.png",
+            "link": "/pages/contact",
+            "alt": "Advertise here \u2014 this ad slot is available"
+          }
+        },
+        "s4": {
+          "type": "slot",
+          "settings": {
+            "image": "shopify://shop_images/advertise-here-4.png",
+            "link": "/pages/contact",
+            "alt": "Advertise here \u2014 this ad slot is available"
+          }
+        },
+        "s5": {
+          "type": "slot",
+          "settings": {
+            "image": "shopify://shop_images/advertise-here-5.png",
+            "link": "/pages/contact",
+            "alt": "Advertise here \u2014 this ad slot is available"
+          }
+        }
+      },
+      "block_order": [
+        "s1",
+        "s2",
+        "s3",
+        "s4",
+        "s5"
+      ],
+      "settings": {
+        "total_slots": 5,
+        "slot_width": 300,
+        "slot_height": 100,
+        "gap": 12,
+        "scroll_speed": 18,
+        "direction": "left",
+        "bg_color": "",
+        "border_color": "",
+        "stripe_color": ""
+      }
+    },
+    "birdlabs_callback": {
+      "type": "birdlabs-callback",
+      "blocks": {
+        "p1": {
+          "type": "point",
+          "settings": {
+            "icon": "\u23f1\ufe0f",
+            "text": "Usually a same-day call back"
+          }
+        },
+        "p2": {
+          "type": "point",
+          "settings": {
+            "icon": "\ud83e\udde0",
+            "text": "Straight to someone who knows the products"
+          }
+        },
+        "p3": {
+          "type": "point",
+          "settings": {
+            "icon": "\ud83d\udeab",
+            "text": "No obligation, no hard sell"
+          }
+        }
+      },
+      "block_order": [
+        "p1",
+        "p2",
+        "p3"
+      ],
+      "settings": {
+        "eyebrow": "Talk to a human",
+        "heading": "Not sure where to start? We'll call you.",
+        "body": "Leave a number and one of our specialists will call you back \u2014 usually the same day. Ask anything: what to buy, how to use it, or whether it suits your setup.",
+        "button_label": "Request a callback",
+        "phone_placeholder": "(555) 123-4567",
+        "show_topic": true,
+        "topic_placeholder": "What would you like to talk through?",
+        "reassurance": "We use your number only to return this call.",
+        "anchor_id": "callback",
+        "bg_color": "",
+        "text_color": "",
+        "accent_color": ""
+      }
+    },
+    "birdlabs_hero3": {
+      "type": "birdlabs-custom-hero3",
+      "blocks": {
+        "i1": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/20260105_163329.jpg",
+            "alt": "Flora Bella in the garden"
+          }
+        },
+        "i2": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Why_Growers_Choose_1_of_6_Compost_pile.jpg",
+            "alt": "Compost pile"
+          }
+        },
+        "i3": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Why_Growers_Choose_2_of_6_FB_Zoom_in.jpg",
+            "alt": "Trace minerals close up"
+          }
+        },
+        "p1": {
+          "type": "point",
+          "settings": {
+            "icon": "\ud83c\udf31",
+            "text": "Organic trace minerals"
+          }
+        },
+        "p2": {
+          "type": "point",
+          "settings": {
+            "icon": "\ud83e\udeb4",
+            "text": "Safe for soil, coco and hydro"
+          }
+        },
+        "p3": {
+          "type": "point",
+          "settings": {
+            "icon": "\ud83c\uddfa\ud83c\uddf8",
+            "text": "Quarried and refined in the USA"
+          }
+        }
+      },
+      "block_order": [
+        "i1",
+        "i2",
+        "i3",
+        "p1",
+        "p2",
+        "p3"
+      ],
+      "settings": {
+        "eyebrow": "Premium trace minerals",
+        "heading": "Wake up your soil",
+        "heading_accent": "today",
+        "body": "An organic, ancient mineral deposit \u2014 quarried, composted and refined so the natural biology in your soil comes back to life.",
+        "note": "Over seventy naturally occurring trace minerals. Feed the soil first, and the roots take up more of everything you already give them.",
+        "cta_label": "Shop now",
+        "cta_url": "#products",
+        "cta2_label": "Our story",
+        "cta2_url": "/pages/our-story",
+        "media_position": "right",
+        "image_radius": 20,
+        "rotate_seconds": 6,
+        "anchor_id": "home",
+        "bg_color": "",
+        "text_color": "",
+        "accent_color": ""
+      }
+    },
+    "birdlabs_promo": {
+      "type": "birdlabs-promo-strip",
+      "blocks": {
+        "a": {
+          "type": "promo",
+          "settings": {
+            "product": "bfb-aerator-plus",
+            "badge": "New",
+            "doc_url": "https://cdn.shopify.com/s/files/1/0755/4485/4597/files/FB-Direct_Ag_Solutions_Areator_Plus_Flyer_PROD.pdf",
+            "doc_label": "Spec sheet"
+          }
+        },
+        "y": {
+          "type": "promo",
+          "settings": {
+            "product": "bfb-yield-boost",
+            "badge": "New",
+            "doc_url": "https://cdn.shopify.com/s/files/1/0755/4485/4597/files/FB-YIELDBOOST_Brochure_PROD.pdf",
+            "doc_label": "Brochure"
+          }
+        }
+      },
+      "block_order": [
+        "a",
+        "y"
+      ],
+      "settings": {
+        "eyebrow": "New this month",
+        "button_label": "Add",
+        "columns": 2,
+        "bg_color": "",
+        "accent_color": ""
+      }
+    },
+    "birdlabs_scoop": {
+      "type": "birdlabs-scoop-analysis",
+      "blocks": {
+        "m0": {
+          "type": "mineral",
+          "settings": {
+            "symbol": "Mg",
+            "name": "Magnesium",
+            "number": "12",
+            "benefit": "Supports deep green foliage and energy production in leaves."
+          }
+        },
+        "m1": {
+          "type": "mineral",
+          "settings": {
+            "symbol": "Fe",
+            "name": "Iron",
+            "number": "26",
+            "benefit": "Essential for chlorophyll production and oxygen transport."
+          }
+        },
+        "m2": {
+          "type": "mineral",
+          "settings": {
+            "symbol": "Zn",
+            "name": "Zinc",
+            "number": "30",
+            "benefit": "Activates enzymes and regulates growth hormones."
+          }
+        },
+        "m3": {
+          "type": "mineral",
+          "settings": {
+            "symbol": "Cu",
+            "name": "Copper",
+            "number": "29",
+            "benefit": "Supports protein synthesis and strengthens cell walls."
+          }
+        },
+        "m4": {
+          "type": "mineral",
+          "settings": {
+            "symbol": "Mn",
+            "name": "Manganese",
+            "number": "25",
+            "benefit": "Helps chelate nutrients so roots can reach what the soil already holds."
+          }
+        },
+        "m5": {
+          "type": "mineral",
+          "settings": {
+            "symbol": "B",
+            "name": "Boron",
+            "number": "5",
+            "benefit": "Critical for cell division and fruit and seed development."
+          }
+        },
+        "a0": {
+          "type": "analysis",
+          "settings": {
+            "element": "Calcium",
+            "symbol": "Ca",
+            "percentage": "1.40%"
+          }
+        },
+        "a1": {
+          "type": "analysis",
+          "settings": {
+            "element": "Magnesium",
+            "symbol": "Mg",
+            "percentage": "1.40%"
+          }
+        },
+        "a2": {
+          "type": "analysis",
+          "settings": {
+            "element": "Sulfur",
+            "symbol": "S",
+            "percentage": "3.65%"
+          }
+        },
+        "a3": {
+          "type": "analysis",
+          "settings": {
+            "element": "Boron",
+            "symbol": "B",
+            "percentage": "0.02%"
+          }
+        },
+        "a4": {
+          "type": "analysis",
+          "settings": {
+            "element": "Cobalt",
+            "symbol": "Co",
+            "percentage": "0.0028%"
+          }
+        },
+        "a5": {
+          "type": "analysis",
+          "settings": {
+            "element": "Copper",
+            "symbol": "Cu",
+            "percentage": "0.25%"
+          }
+        },
+        "a6": {
+          "type": "analysis",
+          "settings": {
+            "element": "Iron",
+            "symbol": "Fe",
+            "percentage": "2.50%"
+          }
+        },
+        "a7": {
+          "type": "analysis",
+          "settings": {
+            "element": "Manganese",
+            "symbol": "Mn",
+            "percentage": "0.24%"
+          }
+        },
+        "a8": {
+          "type": "analysis",
+          "settings": {
+            "element": "Molybdenum",
+            "symbol": "Mo",
+            "percentage": "0.0005%"
+          }
+        },
+        "a9": {
+          "type": "analysis",
+          "settings": {
+            "element": "Zinc",
+            "symbol": "Zn",
+            "percentage": "0.48%"
+          }
+        }
+      },
+      "block_order": [
+        "m0",
+        "m1",
+        "m2",
+        "m3",
+        "m4",
+        "m5",
+        "a0",
+        "a1",
+        "a2",
+        "a3",
+        "a4",
+        "a5",
+        "a6",
+        "a7",
+        "a8",
+        "a9"
+      ],
+      "settings": {
+        "eyebrow": "70+ trace minerals",
+        "heading": "Inside every scoop",
+        "body": "A broad spectrum of naturally occurring trace minerals \u2014 the elements soil biology needs to unlock what your ground already holds.",
+        "ga_title": "Guaranteed analysis",
+        "ga_subtitle": "View mineral percentages",
+        "ga_open": false,
+        "ga_footnote": "Minimum percentages by weight \u00b7 Lab tested",
+        "anchor_id": "analysis",
+        "bg_color": "",
+        "accent_color": ""
       }
     }
   },
   "order": [
-    "marquee_MY8TjJ",
-    "birdlabs_custom_hero1_Px4Rke",
-    "product_list_fa6P9H"
+    "birdlabs_admq",
+    "birdlabs_promo",
+    "birdlabs_hero3",
+    "birdlabs_products_demo",
+    "birdlabs_scoop",
+    "birdlabs_reels_demo",
+    "birdlabs_story_demo",
+    "birdlabs_contact_demo",
+    "birdlabs_callback"
   ]
 }
