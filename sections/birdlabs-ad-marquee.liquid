@@ -1,20 +1,23 @@
 {% comment %}
   sections/birdlabs-ad-marquee.liquid
 
-  Birdlabs Ad Marquee — a horizontally scrolling strip of promo/ad slots, with an optional
-  fixed lead-in slot that does not scroll.
+  Birdlabs Ad Marquee — a continuously scrolling strip of promo/ad slots.
 
   Design concepts ported from divorcemachine.com
   (frontend/src/components/MarqueeBar.jsx + AdSlot.jsx, and .ad-strip in index.css):
 
   - a continuously scrolling strip of fixed-size slots
-  - an optional non-scrolling lead-in slot ahead of the strip
   - configurable slot size, count, scroll speed and direction
   - **unbooked slots render as a diagonal-stripe placeholder** rather than collapsing, so the
     strip keeps its shape and the available inventory is visible. This is the good idea in the
     original and it is kept.
   - filled slots are links whose images use object-fit, so odd-sized creatives letterbox
     instead of stretching
+
+  THE STRIP ALWAYS SCROLLS. divorcemachine also has a fixed, non-scrolling lead-in slot for
+  premium placement; that concept is deliberately NOT carried over. A static card sitting
+  beside a moving strip reads as broken rather than as premium, and it gave the section two
+  behaviours to explain where one will do. Direction is the only choice about the motion.
 
   Adapted rather than copied, in three ways:
 
@@ -57,27 +60,6 @@
   "
 >
   <div class="birdlabs-admq__inner">
-    {%- if section.settings.show_lead_in -%}
-      {%- assign lead = section.blocks | where: 'type', 'lead_in' | first -%}
-      <div
-        class="birdlabs-admq__lead"
-        style="--admq-slot-w: {{ section.settings.lead_in_width }}px;"
-        {% if lead %}{{ lead.shopify_attributes }}{% endif %}
-      >
-        {%- if lead and lead.settings.image != blank -%}
-          <a class="birdlabs-admq__slot" href="{{ lead.settings.link | default: '#' }}">
-            {{
-              lead.settings.image
-              | image_url: width: 800
-              | image_tag: class: 'birdlabs-admq__img', loading: 'lazy', alt: lead.settings.alt
-            }}
-          </a>
-        {%- else -%}
-          <span class="birdlabs-admq__slot birdlabs-admq__slot--empty" aria-hidden="true"></span>
-        {%- endif -%}
-      </div>
-    {%- endif -%}
-
     <div class="birdlabs-admq__viewport">
       <div class="birdlabs-admq__track">
         {%- comment -%}
@@ -135,11 +117,6 @@
     display: flex;
     align-items: center;
     gap: var(--admq-gap, 12px);
-  }
-
-  .birdlabs-admq__lead {
-    flex: 0 0 auto;
-    padding-left: var(--admq-gap, 12px);
   }
 
   .birdlabs-admq__viewport {
@@ -244,28 +221,6 @@
           "info": "Describes the ad for screen readers."
         }
       ]
-    },
-    {
-      "type": "lead_in",
-      "name": "Lead-in slot",
-      "limit": 1,
-      "settings": [
-        {
-          "type": "image_picker",
-          "id": "image",
-          "label": "Creative"
-        },
-        {
-          "type": "url",
-          "id": "link",
-          "label": "Links to"
-        },
-        {
-          "type": "text",
-          "id": "alt",
-          "label": "Alt text"
-        }
-      ]
     }
   ],
   "settings": [
@@ -343,27 +298,6 @@
           "label": "Left to right"
         }
       ]
-    },
-    {
-      "type": "header",
-      "content": "Lead-in"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_lead_in",
-      "label": "Show a fixed lead-in slot",
-      "info": "Sits before the strip and stays put while the rest scrolls.",
-      "default": false
-    },
-    {
-      "type": "range",
-      "id": "lead_in_width",
-      "label": "Lead-in width",
-      "min": 120,
-      "max": 600,
-      "step": 10,
-      "unit": "px",
-      "default": 300
     },
     {
       "type": "header",

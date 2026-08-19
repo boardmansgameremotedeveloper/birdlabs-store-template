@@ -213,14 +213,6 @@
             "link": "/pages/contact",
             "alt": "Advertise here \u2014 this ad slot is available"
           }
-        },
-        "lead": {
-          "type": "lead_in",
-          "settings": {
-            "image": "shopify://shop_images/advertise-here-1.png",
-            "link": "/pages/contact",
-            "alt": "Advertise here \u2014 featured ad slot"
-          }
         }
       },
       "block_order": [
@@ -228,8 +220,7 @@
         "s2",
         "s3",
         "s4",
-        "s5",
-        "lead"
+        "s5"
       ],
       "settings": {
         "total_slots": 5,
@@ -238,8 +229,6 @@
         "gap": 12,
         "scroll_speed": 18,
         "direction": "left",
-        "show_lead_in": true,
-        "lead_in_width": 300,
         "bg_color": "",
         "border_color": "",
         "stripe_color": ""
