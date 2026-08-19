@@ -1,0 +1,451 @@
+{% comment %}
+  sections/birdlabs-header-1.liquid
+
+  Birdlabs Header — a one-pager-friendly header with layout and theme control.
+  Informed by FLTHQ's sections/flt-header-2.liquid (Horizon 3.4.0), rebuilt for 4.1.4.
+
+  What it adds over the source, and why:
+  - **Logo position and nav alignment are independent settings** (the main requirement).
+    FLTHQ hard-codes `justify-content: space-between`, which only ever produces logo-left /
+    nav-right. Here a three-column grid lets the nav sit left, centre or right of its own
+    track, with the logo left or centred, so one section covers every arrangement.
+  - **Light / dark / custom theme.** FLTHQ exposes two colour pickers and nothing else, so
+    every clone has to re-pick a palette. Light and dark are one click; custom keeps the
+    pickers for when a brand needs them.
+  - Transparent-over-hero with a solid state on scroll — the FLTHQ behaviour, kept.
+  - Menu comes from a `link_list`, so it is edited the normal Shopify way. Anchor links
+    (/#products) work with assets/birdlabs-anchor-scroll.js for one-page navigation.
+  - Cart button reuses Horizon's stock drawer rather than shipping another cart.
+
+  Add it in the theme editor under Header. It does not modify sections/header-group.json.
+{% endcomment %}
+
+{%- liquid
+  assign scheme = section.settings.color_scheme
+  case scheme
+    when 'light'
+      assign bg = '#ffffff'
+      assign fg = '#0b2545'
+      assign muted = '#64748b'
+    when 'dark'
+      assign bg = '#111318'
+      assign fg = '#ffffff'
+      assign muted = '#a3adbb'
+    else
+      assign bg = section.settings.custom_bg
+      assign fg = section.settings.custom_fg
+      assign muted = section.settings.custom_muted
+  endcase
+
+  assign is_home = false
+  if template.name == 'index'
+    assign is_home = true
+  endif
+
+  assign transparent = false
+  if section.settings.transparent_on_home and is_home
+    assign transparent = true
+  endif
+-%}
+
+<birdlabs-header
+  class="birdlabs-header{% if transparent %} birdlabs-header--transparent{% endif %}{% if section.settings.sticky %} birdlabs-header--sticky{% endif %}"
+  data-section-id="{{ section.id }}"
+  style="
+    --bh-bg: {{ bg }};
+    --bh-fg: {{ fg }};
+    --bh-muted: {{ muted }};
+    --bh-accent: {{ section.settings.accent_color }};
+    --bh-height: {{ section.settings.height }}px;
+    --bh-radius: {{ section.settings.link_radius }}px;
+  "
+>
+  <div class="birdlabs-header__inner birdlabs-header__inner--logo-{{ section.settings.logo_position }}">
+    <div class="birdlabs-header__brand">
+      <a class="birdlabs-header__logo" href="{{ routes.root_url }}">
+        {%- if section.settings.logo_image != blank -%}
+          {{
+            section.settings.logo_image
+            | image_url: width: 400
+            | image_tag:
+              class: 'birdlabs-header__logo-img',
+              widths: '100, 200, 400',
+              alt: shop.name
+          }}
+        {%- else -%}
+          <span class="birdlabs-header__logo-text">
+            {{- section.settings.logo_text | default: shop.name | escape -}}
+          </span>
+          {%- if section.settings.logo_subtext != blank -%}
+            <span class="birdlabs-header__logo-sub">{{ section.settings.logo_subtext | escape }}</span>
+          {%- endif -%}
+        {%- endif -%}
+      </a>
+    </div>
+
+    <nav
+      class="birdlabs-header__nav birdlabs-header__nav--{{ section.settings.nav_alignment }}"
+      aria-label="Main navigation"
+    >
+      {%- for link in section.settings.menu.links -%}
+        <a
+          class="birdlabs-header__link{% if link.active %} is-active{% endif %}"
+          href="{{ link.url }}"
+        >
+          {{- link.title | escape -}}
+        </a>
+      {%- endfor -%}
+    </nav>
+
+    <div class="birdlabs-header__actions">
+      {%- if section.settings.show_search -%}
+        <a class="birdlabs-header__icon" href="{{ routes.search_url }}" aria-label="{{ 'placeholders.search' | t }}">
+          {{- 'icon-search.svg' | inline_asset_content -}}
+        </a>
+      {%- endif -%}
+
+      {%- if section.settings.show_account and shop.customer_accounts_enabled -%}
+        <a class="birdlabs-header__icon" href="{{ routes.account_url }}" aria-label="{{ 'accessibility.account' | t }}">
+          {{- 'icon-account.svg' | inline_asset_content -}}
+        </a>
+      {%- endif -%}
+
+      {%- comment -%}
+        Opens Horizon's stock cart drawer rather than shipping a second cart. The href is a
+        real /cart link, so it still works if JavaScript never runs.
+      {%- endcomment -%}
+      <a class="birdlabs-header__cart" href="{{ routes.cart_url }}" data-birdlabs-cart>
+        <span class="birdlabs-header__cart-label">
+          {{- section.settings.cart_label | escape -}}
+        </span>
+        <span class="birdlabs-header__cart-count" data-cart-count>{{ cart.item_count }}</span>
+      </a>
+
+      <button
+        class="birdlabs-header__burger"
+        type="button"
+        aria-expanded="false"
+        aria-controls="birdlabs-mobile-{{ section.id }}"
+        aria-label="Menu"
+      >
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="birdlabs-header__mobile" id="birdlabs-mobile-{{ section.id }}" hidden>
+    {%- for link in section.settings.menu.links -%}
+      <a class="birdlabs-header__mobile-link" href="{{ link.url }}">{{ link.title | escape }}</a>
+    {%- endfor -%}
+  </div>
+</birdlabs-header>
+
+<script src="{{ 'birdlabs-header.js' | asset_url }}" defer></script>
+<script src="{{ 'birdlabs-anchor-scroll.js' | asset_url }}" defer></script>
+
+{% stylesheet %}
+  .birdlabs-header {
+    display: block;
+    background: var(--bh-bg);
+    color: var(--bh-fg);
+    transition: background-color 0.4s ease, box-shadow 0.3s ease;
+  }
+
+  .birdlabs-header--sticky {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+  }
+
+  /* Transparent over a full-bleed hero, solid once scrolled past it. */
+  .birdlabs-header--transparent:not(.is-scrolled) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: transparent;
+  }
+
+  .birdlabs-header.is-scrolled {
+    background: var(--bh-bg);
+    box-shadow: 0 1px 20px rgb(0 0 0 / 8%);
+  }
+
+  /*
+   * Three tracks: brand | nav | actions. The nav aligns inside its own track, so nav
+   * alignment and logo position are genuinely independent — the thing a single
+   * `justify-content: space-between` cannot express.
+   */
+  .birdlabs-header__inner {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 24px;
+    max-width: 1400px;
+    min-height: var(--bh-height, 72px);
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .birdlabs-header__inner--center {
+    grid-template-columns: 1fr auto 1fr;
+  }
+
+  .birdlabs-header__inner--center .birdlabs-header__brand {
+    grid-column: 2;
+    justify-self: center;
+    order: 2;
+  }
+
+  .birdlabs-header__inner--center .birdlabs-header__nav {
+    grid-column: 1;
+    grid-row: 1;
+    order: 1;
+  }
+
+  .birdlabs-header__inner--center .birdlabs-header__actions {
+    grid-column: 3;
+    order: 3;
+  }
+
+  .birdlabs-header__logo {
+    display: flex;
+    flex-direction: column;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .birdlabs-header__logo-img {
+    display: block;
+    width: auto;
+    max-height: calc(var(--bh-height, 72px) - 28px);
+  }
+
+  .birdlabs-header__logo-text {
+    font-family: var(--font-heading--family);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1.1;
+  }
+
+  .birdlabs-header__logo-sub {
+    font-family: var(--font-body--family);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--bh-muted);
+  }
+
+  .birdlabs-header__nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .birdlabs-header__nav--left { justify-content: flex-start; }
+  .birdlabs-header__nav--center { justify-content: center; }
+  .birdlabs-header__nav--right { justify-content: flex-end; }
+
+  .birdlabs-header__link {
+    padding: 8px 18px;
+    border-radius: var(--bh-radius, 24px);
+    color: var(--bh-muted);
+    font-family: var(--font-body--family);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.25s ease, background-color 0.25s ease;
+  }
+
+  .birdlabs-header__link:hover { color: var(--bh-fg); }
+
+  .birdlabs-header__link.is-active {
+    background: color-mix(in srgb, var(--bh-fg) 8%, transparent);
+    color: var(--bh-fg);
+  }
+
+  .birdlabs-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .birdlabs-header__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    color: var(--bh-fg);
+  }
+
+  .birdlabs-header__icon svg { width: 20px; height: 20px; }
+
+  .birdlabs-header__cart {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border-radius: var(--bh-radius, 24px);
+    background: var(--bh-accent);
+    color: #fff;
+    font-family: var(--font-body--family);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .birdlabs-header__burger {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    width: 36px;
+    height: 36px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+
+  .birdlabs-header__burger span {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: var(--bh-fg);
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+
+  /*
+   * `display: flex` outranks the user-agent's `[hidden] { display: none }`, so the panel
+   * must hide itself explicitly — otherwise the mobile menu renders open on desktop.
+   */
+  .birdlabs-header__mobile {
+    display: none;
+    flex-direction: column;
+    padding: 8px 24px 20px;
+    background: var(--bh-bg);
+  }
+
+  @media screen and (max-width: 989px) {
+    .birdlabs-header__mobile:not([hidden]) { display: flex; }
+  }
+
+  .birdlabs-header__mobile-link {
+    padding: 12px 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--bh-fg) 10%, transparent);
+    color: var(--bh-fg);
+    font-family: var(--font-body--family);
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  @media screen and (max-width: 989px) {
+    .birdlabs-header__nav { display: none; }
+    .birdlabs-header__burger { display: flex; }
+    .birdlabs-header__inner,
+    .birdlabs-header__inner--center { grid-template-columns: auto 1fr auto; }
+    .birdlabs-header__inner--center .birdlabs-header__brand {
+      grid-column: 1;
+      justify-self: start;
+      order: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .birdlabs-header,
+    .birdlabs-header__link,
+    .birdlabs-header__burger span { transition: none; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Birdlabs Header",
+  "tag": "header",
+  "class": "birdlabs-header-wrapper",
+  "enabled_on": { "groups": ["header"] },
+  "settings": [
+    { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" },
+    { "type": "header", "content": "Layout" },
+    {
+      "type": "select",
+      "id": "logo_position",
+      "label": "Logo position",
+      "default": "left",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "nav_alignment",
+      "label": "Navigation alignment",
+      "info": "Where the menu sits in the space between the logo and the cart.",
+      "default": "right",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "height",
+      "label": "Header height",
+      "min": 56,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "link_radius",
+      "label": "Link corner radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    { "type": "checkbox", "id": "sticky", "label": "Stick to top on scroll", "default": true },
+    {
+      "type": "checkbox",
+      "id": "transparent_on_home",
+      "label": "Transparent over the homepage hero",
+      "info": "Turns solid once the visitor scrolls past it.",
+      "default": false
+    },
+    { "type": "header", "content": "Theme" },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "light",
+      "options": [
+        { "value": "light", "label": "Light" },
+        { "value": "dark", "label": "Dark" },
+        { "value": "custom", "label": "Custom" }
+      ]
+    },
+    { "type": "color", "id": "custom_bg", "label": "Custom background", "default": "#a8d5f2" },
+    { "type": "color", "id": "custom_fg", "label": "Custom text", "default": "#0b2545" },
+    { "type": "color", "id": "custom_muted", "label": "Custom muted text", "default": "#64748b" },
+    { "type": "color", "id": "accent_color", "label": "Cart button color", "default": "#0b2545" },
+    { "type": "header", "content": "Branding" },
+    { "type": "image_picker", "id": "logo_image", "label": "Logo image" },
+    { "type": "text", "id": "logo_text", "label": "Logo text", "info": "Used when no image is set." },
+    { "type": "text", "id": "logo_subtext", "label": "Logo subtext" },
+    { "type": "header", "content": "Actions" },
+    { "type": "checkbox", "id": "show_search", "label": "Show search", "default": false },
+    { "type": "checkbox", "id": "show_account", "label": "Show account", "default": false },
+    { "type": "text", "id": "cart_label", "label": "Cart label", "default": "Cart" }
+  ],
+  "presets": [{ "name": "Birdlabs Header" }]
+}
+{% endschema %}
