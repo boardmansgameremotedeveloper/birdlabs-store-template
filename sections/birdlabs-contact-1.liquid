@@ -1,0 +1,312 @@
+{% comment %}
+  sections/birdlabs-contact-1.liquid
+
+  Birdlabs Contact — contact details beside Shopify's native contact form.
+  Ported from FLTHQ's sections/flt-contact-1.liquid (Horizon 3.4.0) to Horizon 4.1.4.
+
+  Deliberate changes from the source:
+  - Contact rows (address / email / phone) were three hard-coded rows with emoji icons.
+    Here they are section BLOCKS, so a merchant adds only the rows they have.
+  - The hard-coded "Secure Payments by Authorize.net" trust badge is NOT carried over.
+    It named a specific payment provider and misspelled "accepted"; asserting a payment
+    processor the store may not use is worse than omitting it. It is now an optional,
+    merchant-written note with no provider baked in.
+  - Client artwork (plane icon) not carried over.
+  - Uses Shopify's {% form 'contact' %}, which posts to the store's contact endpoint and
+    emails the store owner — no third-party service, no configuration.
+{% endcomment %}
+
+{%- liquid
+  assign anchor = section.settings.anchor_id | strip | handleize
+  if anchor == blank
+    assign anchor = 'birdlabs-contact-' | append: section.id
+  endif
+-%}
+
+<section
+  id="{{ anchor }}"
+  class="birdlabs-contact"
+  data-section-id="{{ section.id }}"
+  style="background: {{ section.settings.bg_color }};"
+>
+  <div class="birdlabs-contact__inner">
+    <div class="birdlabs-contact__col birdlabs-reveal">
+      {%- if section.settings.eyebrow != blank -%}
+        <div class="birdlabs-contact__eyebrow">{{ section.settings.eyebrow | escape }}</div>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="birdlabs-contact__heading">{{ section.settings.heading | escape }}</h2>
+      {%- endif -%}
+      {%- if section.settings.subtext != blank -%}
+        <p class="birdlabs-contact__body">{{ section.settings.subtext | escape }}</p>
+      {%- endif -%}
+
+      {%- if section.blocks.size > 0 -%}
+        <div class="birdlabs-contact__info-list">
+          {%- for block in section.blocks -%}
+            <div class="birdlabs-contact__info-row" {{ block.shopify_attributes }}>
+              {%- if block.settings.icon != blank -%}
+                <div class="birdlabs-contact__info-icon" aria-hidden="true">
+                  {{- block.settings.icon | escape -}}
+                </div>
+              {%- endif -%}
+              <div>
+                {%- if block.settings.label != blank -%}
+                  <div class="birdlabs-contact__info-label">{{ block.settings.label | escape }}</div>
+                {%- endif -%}
+                <div class="birdlabs-contact__info-val">{{ block.settings.value | escape }}</div>
+              </div>
+            </div>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.note != blank -%}
+        <p class="birdlabs-contact__note">{{ section.settings.note | escape }}</p>
+      {%- endif -%}
+    </div>
+
+    <div class="birdlabs-contact__col birdlabs-reveal" style="transition-delay: 0.2s">
+      <div class="birdlabs-contact__form-wrap">
+        {%- form 'contact', class: 'birdlabs-contact__form' -%}
+          {%- if form.posted_successfully? -%}
+            <p class="birdlabs-contact__success">
+              {{ 'blocks.contact_form.post_success' | t }}
+            </p>
+          {%- endif -%}
+
+          {%- if form.errors -%}
+            <p class="birdlabs-contact__error">
+              {{ form.errors | default_errors }}
+            </p>
+          {%- endif -%}
+
+          <label class="birdlabs-contact__label" for="ContactName-{{ section.id }}">Name</label>
+          <input
+            class="birdlabs-contact__input"
+            id="ContactName-{{ section.id }}"
+            type="text"
+            name="contact[name]"
+            value="{{ form.name }}"
+            autocomplete="name"
+          >
+
+          <label class="birdlabs-contact__label" for="ContactEmail-{{ section.id }}">Email</label>
+          <input
+            class="birdlabs-contact__input"
+            id="ContactEmail-{{ section.id }}"
+            type="email"
+            name="contact[email]"
+            value="{{ form.email }}"
+            autocomplete="email"
+            required
+          >
+
+          <label class="birdlabs-contact__label" for="ContactBody-{{ section.id }}">Message</label>
+          <textarea
+            class="birdlabs-contact__input birdlabs-contact__textarea"
+            id="ContactBody-{{ section.id }}"
+            name="contact[body]"
+            rows="5"
+            required
+          >{{ form.body }}</textarea>
+
+          <button class="birdlabs-contact__submit" type="submit">
+            {{ section.settings.submit_label | escape }}
+          </button>
+        {%- endform -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="{{ 'birdlabs-anchor-scroll.js' | asset_url }}" defer></script>
+
+{% stylesheet %}
+  .birdlabs-contact { padding: 120px 40px; }
+
+  .birdlabs-contact__inner {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 56px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .birdlabs-contact__eyebrow {
+    margin-bottom: 12px;
+    font-family: var(--font-body--family);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+
+  .birdlabs-contact__heading {
+    margin: 0 0 16px;
+    font-family: var(--font-heading--family);
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    line-height: 1.05;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .birdlabs-contact__body {
+    margin: 0 0 32px;
+    font-family: var(--font-body--family);
+    font-size: 1rem;
+    line-height: 1.7;
+    opacity: 0.75;
+  }
+
+  .birdlabs-contact__info-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .birdlabs-contact__info-icon { font-size: 1.25rem; line-height: 1.4; }
+
+  .birdlabs-contact__info-label {
+    font-family: var(--font-body--family);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.5;
+  }
+
+  .birdlabs-contact__info-val {
+    font-family: var(--font-body--family);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  .birdlabs-contact__note {
+    margin-top: 24px;
+    font-family: var(--font-body--family);
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    opacity: 0.55;
+  }
+
+  .birdlabs-contact__form-wrap {
+    padding: 32px;
+    border: 1px solid rgb(0 0 0 / 10%);
+    border-radius: 16px;
+    background: rgb(255 255 255 / 60%);
+  }
+
+  .birdlabs-contact__label {
+    display: block;
+    margin-bottom: 6px;
+    font-family: var(--font-body--family);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+
+  .birdlabs-contact__input {
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 12px 14px;
+    border: 1px solid rgb(0 0 0 / 15%);
+    border-radius: 8px;
+    background: #fff;
+    color: inherit;
+    font-family: var(--font-body--family);
+    font-size: 0.9375rem;
+  }
+
+  .birdlabs-contact__textarea { resize: vertical; }
+
+  .birdlabs-contact__submit {
+    padding: 14px 40px;
+    border: none;
+    border-radius: 40px;
+    background: var(--birdlabs-accent, #0b2545);
+    color: #fff;
+    font-family: var(--font-heading--family);
+    font-size: 0.9375rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .birdlabs-contact__success,
+  .birdlabs-contact__error {
+    margin: 0 0 20px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-family: var(--font-body--family);
+    font-size: 0.875rem;
+  }
+
+  .birdlabs-contact__success { background: rgb(0 128 0 / 10%); }
+  .birdlabs-contact__error { background: rgb(200 0 0 / 10%); }
+
+  @media (max-width: 768px) {
+    .birdlabs-contact { padding: 80px 20px; }
+    .birdlabs-contact__inner { gap: 40px; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Birdlabs Contact",
+  "tag": "section",
+  "class": "birdlabs-contact-wrapper",
+  "max_blocks": 6,
+  "blocks": [
+    {
+      "type": "info",
+      "name": "Contact detail",
+      "settings": [
+        { "type": "text", "id": "icon", "label": "Icon", "info": "An emoji, e.g. 📍 ✉️ 📱. Optional." },
+        { "type": "text", "id": "label", "label": "Label", "default": "Email" },
+        { "type": "text", "id": "value", "label": "Value", "default": "hello@example.com" }
+      ]
+    }
+  ],
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow text", "default": "Contact" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Get in touch" },
+    {
+      "type": "textarea",
+      "id": "subtext",
+      "label": "Intro paragraph",
+      "default": "Questions about an order, or anything else? Send us a message."
+    },
+    { "type": "text", "id": "submit_label", "label": "Submit button label", "default": "Send message" },
+    {
+      "type": "textarea",
+      "id": "note",
+      "label": "Small print",
+      "info": "Optional note under the contact details — payment or shipping reassurance, for example."
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "info": "For one-page navigation — \"contact\" makes this reachable at /#contact.",
+      "default": "contact"
+    },
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#f0f7ff" }
+  ],
+  "presets": [
+    {
+      "name": "Birdlabs Contact",
+      "blocks": [
+        { "type": "info", "settings": { "icon": "📍", "label": "Address", "value": "123 Example St" } },
+        { "type": "info", "settings": { "icon": "✉️", "label": "Email", "value": "hello@example.com" } },
+        { "type": "info", "settings": { "icon": "📱", "label": "Phone", "value": "+1 555 0100" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

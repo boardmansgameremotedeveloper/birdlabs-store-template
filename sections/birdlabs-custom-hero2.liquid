@@ -10,7 +10,9 @@
   1. var(--head) / var(--body) -> var(--font-heading--family) / var(--font-body--family).
      Neither theme ever defined --head or --body, so the originals resolved to nothing and
      silently fell back to inherited fonts. Ours inherit the merchant's theme typography.
-  2. <style> -> {% stylesheet %}, Horizon's aggregated-and-cached convention.
+  2. <style> -> <script src="{{ 'birdlabs-anchor-scroll.js' | asset_url }}" defer></script>
+
+{% stylesheet %}, Horizon's aggregated-and-cached convention.
   3. Client artwork (the animated-flowers snippet and its SVGs) is NOT carried over — this is
      the shared template repo. The CSS cloud layer is generic and is kept, behind a toggle.
   4. The entrance script is scoped to this section instance, so two can sit on one page.

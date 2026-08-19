@@ -1,0 +1,271 @@
+{% comment %}
+  sections/birdlabs-story-1.liquid
+
+  Birdlabs Story — narrative section with numbered beats and a pull-quote.
+  Ported from FLTHQ's sections/flt-story-2.liquid (Horizon 3.4.0) to Horizon 4.1.4.
+
+  Deliberate changes from the source:
+  - The four story beats were four hard-coded settings groups (beat_1_title, beat_2_title...).
+    Here they are section BLOCKS, so a merchant adds, removes and reorders them in the editor.
+    Numbering is derived from position, not typed in.
+  - Client artwork (plane icon, mustang SVG) not carried over — this is the shared template.
+  - var(--head)/var(--body) -> var(--font-heading--family)/var(--font-body--family); the
+    originals were never defined by either theme and silently fell back.
+  - Colours are settings rather than baked-in brand values.
+{% endcomment %}
+
+{%- liquid
+  assign anchor = section.settings.anchor_id | strip | handleize
+  if anchor == blank
+    assign anchor = 'birdlabs-story-' | append: section.id
+  endif
+-%}
+
+<section
+  id="{{ anchor }}"
+  class="birdlabs-story"
+  data-section-id="{{ section.id }}"
+  style="background: {{ section.settings.bg_color }}; color: {{ section.settings.text_color }};"
+>
+  <div class="birdlabs-story__inner">
+    <div class="birdlabs-story__header birdlabs-reveal">
+      {%- if section.settings.eyebrow != blank -%}
+        <div class="birdlabs-story__eyebrow" style="color: {{ section.settings.accent_color }};">
+          {{- section.settings.eyebrow | escape -}}
+        </div>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="birdlabs-story__heading">{{ section.settings.heading | escape }}</h2>
+      {%- endif -%}
+      {%- if section.settings.intro != blank -%}
+        <p class="birdlabs-story__intro">{{ section.settings.intro | escape }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- if section.blocks.size > 0 -%}
+      <div class="birdlabs-story__beats">
+        {%- for block in section.blocks -%}
+          <div
+            class="birdlabs-story__beat birdlabs-reveal"
+            style="transition-delay: {{ forloop.index | times: 0.1 }}s"
+            {{ block.shopify_attributes }}
+          >
+            <div class="birdlabs-story__beat-num" style="color: {{ section.settings.accent_color }};">
+              {{- forloop.index | prepend: '0' | slice: -2, 2 -}}
+            </div>
+            {%- if block.settings.title != blank -%}
+              <h3 class="birdlabs-story__beat-title">{{ block.settings.title | escape }}</h3>
+            {%- endif -%}
+            {%- if block.settings.body != blank -%}
+              <p class="birdlabs-story__beat-body">{{ block.settings.body | escape }}</p>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    {%- if section.settings.mission_text != blank -%}
+      <div class="birdlabs-story__mission birdlabs-reveal">
+        <div class="birdlabs-story__mission-mark" style="color: {{ section.settings.accent_color }};">&ldquo;</div>
+        <p class="birdlabs-story__mission-text">{{ section.settings.mission_text | escape }}</p>
+      </div>
+    {%- endif -%}
+
+    {%- if section.settings.cta_label != blank -%}
+      <div class="birdlabs-story__cta birdlabs-reveal">
+        <a
+          class="birdlabs-story__cta-link"
+          href="{{ section.settings.cta_url | default: '#' }}"
+          style="border-color: {{ section.settings.accent_color }};"
+        >
+          {{- section.settings.cta_label | escape -}}
+        </a>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+<script src="{{ 'birdlabs-anchor-scroll.js' | asset_url }}" defer></script>
+
+{% stylesheet %}
+  .birdlabs-story { padding: 120px 40px; }
+
+  .birdlabs-story__inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .birdlabs-story__header {
+    margin-bottom: 64px;
+    text-align: center;
+  }
+
+  .birdlabs-story__eyebrow {
+    margin-bottom: 12px;
+    font-family: var(--font-body--family);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+  }
+
+  .birdlabs-story__heading {
+    margin: 0 0 20px;
+    font-family: var(--font-heading--family);
+    font-size: clamp(2.25rem, 4.5vw, 3.75rem);
+    line-height: 1.05;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .birdlabs-story__intro {
+    max-width: 700px;
+    margin: 0 auto;
+    font-family: var(--font-body--family);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    opacity: 0.75;
+  }
+
+  .birdlabs-story__beats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 40px;
+    margin-bottom: 64px;
+  }
+
+  .birdlabs-story__beat-num {
+    margin-bottom: 12px;
+    font-family: var(--font-heading--family);
+    font-size: 2rem;
+    line-height: 1;
+    opacity: 0.6;
+  }
+
+  .birdlabs-story__beat-title {
+    margin: 0 0 10px;
+    font-family: var(--font-heading--family);
+    font-size: 1.1875rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .birdlabs-story__beat-body {
+    margin: 0;
+    font-family: var(--font-body--family);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    opacity: 0.7;
+  }
+
+  .birdlabs-story__mission {
+    margin-bottom: 48px;
+    padding: 48px 40px;
+    border-top: 1px solid currentColor;
+    border-bottom: 1px solid currentColor;
+    text-align: center;
+  }
+
+  .birdlabs-story__mission-mark {
+    margin-bottom: 8px;
+    font-family: var(--font-heading--family);
+    font-size: 3rem;
+    line-height: 1;
+    opacity: 0.5;
+  }
+
+  .birdlabs-story__mission-text {
+    max-width: 760px;
+    margin: 0 auto;
+    font-family: var(--font-body--family);
+    font-size: clamp(1.0625rem, 2vw, 1.375rem);
+    font-style: italic;
+    line-height: 1.7;
+    opacity: 0.75;
+  }
+
+  .birdlabs-story__cta { text-align: center; }
+
+  .birdlabs-story__cta-link {
+    display: inline-block;
+    padding: 14px 40px;
+    border: 2px solid currentColor;
+    border-radius: 40px;
+    color: inherit;
+    font-family: var(--font-heading--family);
+    font-size: 0.9375rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+
+  @media (max-width: 768px) {
+    .birdlabs-story { padding: 80px 20px; }
+    .birdlabs-story__beats { gap: 32px; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Birdlabs Story",
+  "tag": "section",
+  "class": "birdlabs-story-wrapper",
+  "max_blocks": 8,
+  "blocks": [
+    {
+      "type": "beat",
+      "name": "Story beat",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "A chapter title" },
+        {
+          "type": "textarea",
+          "id": "body",
+          "label": "Body",
+          "default": "Two or three sentences about this part of the story."
+        }
+      ]
+    }
+  ],
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow text", "default": "Our story" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "How we got here" },
+    {
+      "type": "textarea",
+      "id": "intro",
+      "label": "Intro paragraph",
+      "default": "A short introduction to the story below."
+    },
+    {
+      "type": "textarea",
+      "id": "mission_text",
+      "label": "Pull-quote",
+      "info": "Shown between the beats and the button. Leave blank to hide."
+    },
+    { "type": "text", "id": "cta_label", "label": "Button label" },
+    { "type": "url", "id": "cta_url", "label": "Button link" },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "info": "For one-page navigation — \"story\" makes this reachable at /#story.",
+      "default": "story"
+    },
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#0b2545" },
+    { "type": "color", "id": "text_color", "label": "Text", "default": "#ffffff" },
+    { "type": "color", "id": "accent_color", "label": "Accent", "default": "#93c5fd" }
+  ],
+  "presets": [
+    {
+      "name": "Birdlabs Story",
+      "category": "t:categories.storytelling",
+      "blocks": [
+        { "type": "beat", "settings": { "title": "Where it started" } },
+        { "type": "beat", "settings": { "title": "What we learned" } },
+        { "type": "beat", "settings": { "title": "How we build" } },
+        { "type": "beat", "settings": { "title": "Where we're going" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
