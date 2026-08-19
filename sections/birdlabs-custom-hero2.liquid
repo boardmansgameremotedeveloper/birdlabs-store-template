@@ -1,0 +1,655 @@
+{% comment %}
+  sections/birdlabs-custom-hero2.liquid
+
+  Birdlabs Custom Hero 2 — full-viewport hero with a crossfading background,
+  drifting cloud layer and a staggered entrance animation.
+
+  Ported from FLTHQ's sections/flt-hero-3.liquid (Horizon 3.4.0) to Horizon 4.1.4.
+  Changes made deliberately during the port — see claude_docs/tasks/0003_flthq_integration/:
+
+  1. var(--head) / var(--body) -> var(--font-heading--family) / var(--font-body--family).
+     Neither theme ever defined --head or --body, so the originals resolved to nothing and
+     silently fell back to inherited fonts. Ours inherit the merchant's theme typography.
+  2. <style> -> {% stylesheet %}, Horizon's aggregated-and-cached convention.
+  3. Client artwork (the animated-flowers snippet and its SVGs) is NOT carried over — this is
+     the shared template repo. The CSS cloud layer is generic and is kept, behind a toggle.
+  4. The entrance script is scoped to this section instance, so two can sit on one page.
+  5. prefers-reduced-motion is honoured: no infinite crossfade, no entrance transition.
+  6. Defaults are neutral. No client copy or brand colour ships in the template.
+{% endcomment %}
+
+{%- liquid
+  assign anchor = section.settings.anchor_id | strip | handleize
+  if anchor == blank
+    assign anchor = 'birdlabs-hero2-' | append: section.id
+  endif
+
+  assign bg_count = 0
+  if section.settings.bg_image_1 != blank
+    assign bg_count = bg_count | plus: 1
+  endif
+  if section.settings.bg_image_2 != blank
+    assign bg_count = bg_count | plus: 1
+  endif
+  if section.settings.bg_image_3 != blank
+    assign bg_count = bg_count | plus: 1
+  endif
+  assign use_images = false
+  if section.settings.show_bg_images and bg_count > 0
+    assign use_images = true
+  endif
+-%}
+
+<section
+  id="{{ anchor }}"
+  class="birdlabs-hero2"
+  data-section-id="{{ section.id }}"
+  style="
+    --birdlabs-hero2-min-height: {{ section.settings.section_height }}vh;
+    {%- unless use_images %} background: {{ section.settings.bg_color }};{% endunless -%}
+  "
+>
+  {%- if use_images -%}
+    <div class="birdlabs-hero2__bg-layer">
+      {%- if section.settings.bg_image_1 != blank -%}
+        <div
+          class="birdlabs-hero2__bg-slide birdlabs-hero2__bg-slide--1{% if bg_count == 1 %} birdlabs-hero2__bg-slide--static{% endif %}"
+          style="background-image: url('{{ section.settings.bg_image_1 | image_url: width: 1600 }}');"
+          role="presentation"
+        ></div>
+      {%- endif -%}
+      {%- if section.settings.bg_image_2 != blank -%}
+        <div
+          class="birdlabs-hero2__bg-slide birdlabs-hero2__bg-slide--2"
+          style="background-image: url('{{ section.settings.bg_image_2 | image_url: width: 1600 }}');"
+          role="presentation"
+        ></div>
+      {%- endif -%}
+      {%- if section.settings.bg_image_3 != blank -%}
+        <div
+          class="birdlabs-hero2__bg-slide birdlabs-hero2__bg-slide--3"
+          style="background-image: url('{{ section.settings.bg_image_3 | image_url: width: 1600 }}');"
+          role="presentation"
+        ></div>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  {%- if section.settings.show_clouds -%}
+    <div class="birdlabs-hero2__clouds" aria-hidden="true">
+      <div class="birdlabs-hero2__cloud" style="top:12%;left:5%;width:280px;height:70px;filter:blur(30px);transition-delay:.5s;"></div>
+      <div class="birdlabs-hero2__cloud" style="top:22%;right:10%;width:200px;height:50px;filter:blur(25px);transition-delay:.8s;"></div>
+      <div class="birdlabs-hero2__cloud" style="top:8%;right:30%;width:350px;height:80px;filter:blur(35px);transition-delay:1s;"></div>
+      <div class="birdlabs-hero2__cloud" style="bottom:30%;left:15%;width:250px;height:60px;filter:blur(28px);transition-delay:1.2s;"></div>
+    </div>
+  {%- endif -%}
+
+  <div class="birdlabs-hero2__content">
+    {%- if section.settings.eyebrow != blank -%}
+      <div class="birdlabs-hero2__eyebrow" style="color: {{ section.settings.eyebrow_color }};">
+        <span class="birdlabs-hero2__rule"></span>
+        {{ section.settings.eyebrow | escape }}
+        <span class="birdlabs-hero2__rule"></span>
+      </div>
+    {%- endif -%}
+
+    {%- if section.settings.heading_line1 != blank or section.settings.heading_line2 != blank -%}
+      <h2 class="birdlabs-hero2__heading" style="color: {{ section.settings.heading_line1_color }};">
+        {{- section.settings.heading_line1 | escape -}}
+        {%- if section.settings.heading_line2 != blank -%}
+          <br>
+          <span style="color: {{ section.settings.heading_line2_color }};">
+            {{- section.settings.heading_line2 | escape -}}
+          </span>
+        {%- endif -%}
+      </h2>
+    {%- endif -%}
+
+    {%- if section.settings.subtext != blank -%}
+      {%- liquid
+        assign border_style = ''
+        if section.settings.body_bg_border == 'thin'
+          assign border_style = '1px solid rgba(0,0,0,0.3)'
+        elsif section.settings.body_bg_border == 'medium'
+          assign border_style = '2px solid rgba(0,0,0,0.3)'
+        elsif section.settings.body_bg_border == 'thick'
+          assign border_style = '4px solid rgba(0,0,0,0.3)'
+        endif
+      -%}
+      {%- if section.settings.show_body_bg -%}
+        <div
+          class="birdlabs-hero2__body-bg"
+          style="
+            background-color: {{ section.settings.body_bg_color | color_modify: 'alpha', 0.6 }};
+            {%- if border_style != blank %} border: {{ border_style }};{% endif -%}
+          "
+        >
+          <p class="birdlabs-hero2__body" style="color: {{ section.settings.body_text_color }};">
+            {{- section.settings.subtext | escape -}}
+          </p>
+        </div>
+      {%- else -%}
+        <p class="birdlabs-hero2__body" style="color: {{ section.settings.body_text_color }};">
+          {{- section.settings.subtext | escape -}}
+        </p>
+      {%- endif -%}
+    {%- endif -%}
+
+    {%- if section.settings.cta_primary_label != blank or section.settings.cta_secondary_label != blank -%}
+      <div class="birdlabs-hero2__ctas">
+        {%- if section.settings.cta_primary_label != blank -%}
+          <a
+            href="{{ section.settings.cta_primary_url | default: '#' }}"
+            class="birdlabs-hero2__cta-primary"
+          >
+            {{- section.settings.cta_primary_label | escape -}}
+          </a>
+        {%- endif -%}
+        {%- if section.settings.cta_secondary_label != blank -%}
+          <a
+            href="{{ section.settings.cta_secondary_url | default: '#' }}"
+            class="birdlabs-hero2__cta-secondary"
+          >
+            {{- section.settings.cta_secondary_label | escape -}}
+          </a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if section.settings.pills != blank -%}
+      <div class="birdlabs-hero2__pills">
+        {%- assign pills = section.settings.pills | split: ',' -%}
+        {%- for pill in pills -%}
+          <span class="birdlabs-hero2__pill">{{ pill | strip | escape }}</span>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- if section.settings.show_announcement and section.settings.announcement_text != blank -%}
+    <div class="birdlabs-hero2__announcement birdlabs-hero2__announcement--{{ section.settings.announcement_position }}">
+      {{- section.settings.announcement_text | escape -}}
+    </div>
+  {%- endif -%}
+</section>
+
+<script>
+  (function () {
+    var root = document.querySelector('[data-section-id="{{ section.id }}"].birdlabs-hero2');
+    if (!root) return;
+    // Next frame rather than a fixed timeout: the entrance runs once styles are applied,
+    // not on a guess about how long that takes.
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        root.classList.add('birdlabs-hero2--loaded');
+      });
+    });
+  })();
+</script>
+
+{% stylesheet %}
+  .birdlabs-hero2 {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    min-height: var(--birdlabs-hero2-min-height, 100vh);
+  }
+
+  .birdlabs-hero2__bg-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .birdlabs-hero2__bg-slide {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+  }
+
+  @keyframes birdlabs-hero2-bg-fade {
+    0%, 100% { opacity: 0; }
+    8% { opacity: 1; }
+    33% { opacity: 1; }
+    41% { opacity: 0; }
+  }
+
+  .birdlabs-hero2__bg-slide--1 { animation: birdlabs-hero2-bg-fade 12s ease-in-out infinite; }
+  .birdlabs-hero2__bg-slide--2 { animation: birdlabs-hero2-bg-fade 12s ease-in-out infinite 4s; }
+  .birdlabs-hero2__bg-slide--3 { animation: birdlabs-hero2-bg-fade 12s ease-in-out infinite 8s; }
+
+  /* A single background image has nothing to cross-fade with — hold it visible. */
+  .birdlabs-hero2__bg-slide--static { animation: none; opacity: 1; }
+
+  .birdlabs-hero2__clouds {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .birdlabs-hero2__cloud {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    transition: opacity 2s ease;
+  }
+
+  .birdlabs-hero2--loaded .birdlabs-hero2__cloud { opacity: 1; }
+
+  .birdlabs-hero2__content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 1000px;
+    padding: 0 40px;
+    text-align: center;
+  }
+
+  .birdlabs-hero2__eyebrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 16px;
+    font-family: var(--font-body--family);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+
+  .birdlabs-hero2__rule {
+    width: 50px;
+    height: 1.5px;
+    background: currentColor;
+    opacity: 0.3;
+  }
+
+  .birdlabs-hero2__heading {
+    margin: 0 0 20px;
+    font-family: var(--font-heading--family);
+    font-size: clamp(3.75rem, 10vw, 8.125rem);
+    line-height: 0.92;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .birdlabs-hero2__body {
+    max-width: 560px;
+    margin: 0 auto 40px;
+    font-family: var(--font-body--family);
+    font-size: 1.1875rem;
+    line-height: 1.7;
+  }
+
+  .birdlabs-hero2__body-bg {
+    max-width: 560px;
+    margin: 0 auto 40px;
+    padding: 20px;
+    border-radius: 12px;
+  }
+
+  .birdlabs-hero2__body-bg .birdlabs-hero2__body { margin: 0; }
+
+  .birdlabs-hero2__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+  }
+
+  .birdlabs-hero2__cta-primary,
+  .birdlabs-hero2__cta-secondary {
+    display: inline-block;
+    border-radius: 40px;
+    font-family: var(--font-heading--family);
+    font-size: 1.0625rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .birdlabs-hero2__cta-primary {
+    padding: 16px 48px;
+    border: none;
+    background: var(--birdlabs-hero2-cta-bg, #1a1a1a);
+    color: var(--birdlabs-hero2-cta-fg, #fff);
+    box-shadow: 0 8px 30px rgb(0 0 0 / 25%);
+  }
+
+  .birdlabs-hero2__cta-secondary {
+    padding: 14px 48px;
+    border: 2px solid currentColor;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    color: var(--birdlabs-hero2-cta-bg, #1a1a1a);
+  }
+
+  .birdlabs-hero2__pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    justify-content: center;
+    margin-top: 56px;
+  }
+
+  .birdlabs-hero2__pill {
+    padding-bottom: 4px;
+    border-bottom: 2px solid currentColor;
+    font-family: var(--font-body--family);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+
+  .birdlabs-hero2__announcement {
+    position: absolute;
+    z-index: 3;
+    background: var(--birdlabs-hero2-cta-bg, #1a1a1a);
+    color: #fff;
+    font-family: var(--font-body--family);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .birdlabs-hero2__announcement--top,
+  .birdlabs-hero2__announcement--bottom {
+    left: 0;
+    right: 0;
+    padding: 12px 20px;
+    text-align: center;
+  }
+
+  .birdlabs-hero2__announcement--top { top: 0; }
+  .birdlabs-hero2__announcement--bottom { bottom: 0; }
+
+  .birdlabs-hero2__announcement--left,
+  .birdlabs-hero2__announcement--right {
+    top: 0;
+    bottom: 0;
+    width: 44px;
+    padding: 20px 12px;
+    writing-mode: vertical-rl;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .birdlabs-hero2__announcement--right { right: 0; }
+  .birdlabs-hero2__announcement--left { left: 0; transform: rotate(180deg); }
+
+  /* Staggered entrance */
+  .birdlabs-hero2__content > * {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .birdlabs-hero2--loaded .birdlabs-hero2__content > * {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .birdlabs-hero2--loaded .birdlabs-hero2__content > *:nth-child(1) { transition-delay: 0.3s; }
+  .birdlabs-hero2--loaded .birdlabs-hero2__content > *:nth-child(2) { transition-delay: 0.6s; }
+  .birdlabs-hero2--loaded .birdlabs-hero2__content > *:nth-child(3) { transition-delay: 0.8s; }
+  .birdlabs-hero2--loaded .birdlabs-hero2__content > *:nth-child(4) { transition-delay: 1s; }
+  .birdlabs-hero2--loaded .birdlabs-hero2__content > *:nth-child(5) { transition-delay: 1.2s; }
+
+  @media (max-width: 768px) {
+    .birdlabs-hero2__content { padding: 0 20px; }
+    .birdlabs-hero2__pills { gap: 16px; }
+    .birdlabs-hero2__cta-primary,
+    .birdlabs-hero2__cta-secondary { padding: 14px 32px; font-size: 0.9375rem; }
+  }
+
+  /*
+   * Reduced motion: a 12s infinite cross-fade and a 1.2s staggered entrance are exactly
+   * what this setting exists to switch off. Content stays visible; only motion stops.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    .birdlabs-hero2__bg-slide { animation: none; }
+    .birdlabs-hero2__bg-slide--1 { opacity: 1; }
+    .birdlabs-hero2__cloud { transition: none; opacity: 1; }
+    .birdlabs-hero2__content > * {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Birdlabs Custom Hero 2",
+  "tag": "section",
+  "class": "birdlabs-hero2-wrapper",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text",
+      "default": "Small label above the heading"
+    },
+    {
+      "type": "text",
+      "id": "heading_line1",
+      "label": "Heading line 1",
+      "default": "Your headline"
+    },
+    {
+      "type": "text",
+      "id": "heading_line2",
+      "label": "Heading line 2",
+      "default": "Here"
+    },
+    {
+      "type": "textarea",
+      "id": "subtext",
+      "label": "Body text",
+      "default": "A short paragraph introducing the store. Replace this with your own copy."
+    },
+    {
+      "type": "text",
+      "id": "pills",
+      "label": "Attribute pills",
+      "info": "Comma-separated. Leave blank to hide.",
+      "default": "Free shipping, Easy returns, Made to order"
+    },
+    {
+      "type": "header",
+      "content": "Buttons"
+    },
+    {
+      "type": "text",
+      "id": "cta_primary_label",
+      "label": "Primary button label",
+      "default": "Shop now"
+    },
+    {
+      "type": "url",
+      "id": "cta_primary_url",
+      "label": "Primary button link"
+    },
+    {
+      "type": "text",
+      "id": "cta_secondary_label",
+      "label": "Secondary button label",
+      "default": "Our story"
+    },
+    {
+      "type": "url",
+      "id": "cta_secondary_url",
+      "label": "Secondary button link"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "info": "For one-page navigation, e.g. \"home\" makes this section reachable at /#home. Leave blank for an automatic ID.",
+      "default": "home"
+    },
+    {
+      "type": "range",
+      "id": "section_height",
+      "label": "Section height",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "vh",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Background"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_bg_images",
+      "label": "Use background images",
+      "info": "Two or three images cross-fade on a 12 second loop. One image stays static.",
+      "default": false
+    },
+    {
+      "type": "image_picker",
+      "id": "bg_image_1",
+      "label": "Background image 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "bg_image_2",
+      "label": "Background image 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "bg_image_3",
+      "label": "Background image 3"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "info": "Used when background images are off.",
+      "default": "#dceefb"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_clouds",
+      "label": "Show soft cloud layer",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "eyebrow_color",
+      "label": "Eyebrow color",
+      "default": "#0b2545"
+    },
+    {
+      "type": "color",
+      "id": "heading_line1_color",
+      "label": "Heading line 1 color",
+      "default": "#0b2545"
+    },
+    {
+      "type": "color",
+      "id": "heading_line2_color",
+      "label": "Heading line 2 color",
+      "default": "#1e3a5f"
+    },
+    {
+      "type": "color",
+      "id": "body_text_color",
+      "label": "Body text color",
+      "default": "#334155"
+    },
+    {
+      "type": "header",
+      "content": "Body text background"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_body_bg",
+      "label": "Show a panel behind the body text",
+      "info": "Helps legibility over a busy background image.",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "body_bg_color",
+      "label": "Panel color",
+      "info": "Applied at 60% opacity.",
+      "default": "#ffffff"
+    },
+    {
+      "type": "select",
+      "id": "body_bg_border",
+      "label": "Panel border",
+      "default": "none",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "thin", "label": "Thin (1px)" },
+        { "value": "medium", "label": "Medium (2px)" },
+        { "value": "thick", "label": "Thick (4px)" }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Announcement"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_announcement",
+      "label": "Show announcement bar",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "announcement_text",
+      "label": "Announcement text",
+      "default": "Free shipping on orders over $50"
+    },
+    {
+      "type": "select",
+      "id": "announcement_position",
+      "label": "Announcement position",
+      "default": "bottom",
+      "options": [
+        { "value": "bottom", "label": "Bottom" },
+        { "value": "top", "label": "Top" },
+        { "value": "right", "label": "Right" },
+        { "value": "left", "label": "Left" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Birdlabs Custom Hero 2",
+      "category": "t:categories.banners"
+    }
+  ]
+}
+{% endschema %}
