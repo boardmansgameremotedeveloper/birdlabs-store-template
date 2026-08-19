@@ -1,0 +1,297 @@
+{% comment %}
+  sections/birdlabs-ad-marquee.liquid
+
+  Birdlabs Ad Marquee — a horizontally scrolling strip of promo/ad slots, with an optional
+  fixed lead-in slot that does not scroll.
+
+  Design concepts ported from divorcemachine.com
+  (frontend/src/components/MarqueeBar.jsx + AdSlot.jsx, and .ad-strip in index.css):
+
+  - a continuously scrolling strip of fixed-size slots
+  - an optional non-scrolling lead-in slot ahead of the strip
+  - configurable slot size, count, scroll speed and direction
+  - **unbooked slots render as a diagonal-stripe placeholder** rather than collapsing, so the
+    strip keeps its shape and the available inventory is visible. This is the good idea in the
+    original and it is kept.
+  - filled slots are links whose images use object-fit, so odd-sized creatives letterbox
+    instead of stretching
+
+  Adapted rather than copied, in three ways:
+
+  1. **Slots are BLOCKS, not an ad-server call.** divorcemachine fetches bookings from its own
+     API and gates on auth. A Shopify theme has no ad service, so each slot is a merchant-
+     editable block: image, link, alt text. Empty blocks — or none at all — fall back to the
+     placeholder, which keeps the "here is inventory" behaviour without a backend.
+
+  2. **The loop is seamless.** The original animates one strip, so it visibly jumps when the
+     animation restarts. Here the track is rendered TWICE and translated -50%, which is the
+     standard way to make a marquee loop with no seam. `aria-hidden` on the duplicate keeps
+     screen readers from reading every slot twice.
+
+  3. **Motion is opt-outable.** Pauses on hover and on focus-within, so a keyboard user can
+     reach a link that is moving, and stops entirely under prefers-reduced-motion.
+{% endcomment %}
+
+{%- liquid
+  assign slot_w = section.settings.slot_width
+  assign slot_h = section.settings.slot_height
+  assign ad_blocks = section.blocks | where: 'type', 'slot'
+  assign fill_to = section.settings.total_slots
+  assign placeholders = fill_to | minus: ad_blocks.size
+  if placeholders < 0
+    assign placeholders = 0
+  endif
+-%}
+
+<section
+  class="birdlabs-admq{% if section.settings.direction == 'right' %} birdlabs-admq--reverse{% endif %}"
+  data-section-id="{{ section.id }}"
+  style="
+    --admq-slot-w: {{ slot_w }}px;
+    --admq-slot-h: {{ slot_h }}px;
+    --admq-gap: {{ section.settings.gap }}px;
+    --admq-speed: {{ section.settings.scroll_speed }}s;
+    --admq-bg: {{ section.settings.bg_color }};
+    --admq-border: {{ section.settings.border_color }};
+  "
+>
+  <div class="birdlabs-admq__inner">
+    {%- if section.settings.show_lead_in -%}
+      {%- assign lead = section.blocks | where: 'type', 'lead_in' | first -%}
+      <div
+        class="birdlabs-admq__lead"
+        style="--admq-slot-w: {{ section.settings.lead_in_width }}px;"
+        {% if lead %}{{ lead.shopify_attributes }}{% endif %}
+      >
+        {%- if lead and lead.settings.image != blank -%}
+          <a class="birdlabs-admq__slot" href="{{ lead.settings.link | default: '#' }}">
+            {{
+              lead.settings.image
+              | image_url: width: 800
+              | image_tag: class: 'birdlabs-admq__img', loading: 'lazy', alt: lead.settings.alt
+            }}
+          </a>
+        {%- else -%}
+          <span class="birdlabs-admq__slot birdlabs-admq__slot--empty" aria-hidden="true"></span>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="birdlabs-admq__viewport">
+      <div class="birdlabs-admq__track">
+        {%- comment -%}
+          Rendered twice: the second copy is what makes the loop seamless. Only the first
+          copy is exposed to assistive technology.
+        {%- endcomment -%}
+        {%- for pass in (1..2) -%}
+          <div
+            class="birdlabs-admq__run"
+            {% if pass == 2 %}aria-hidden="true"{% endif %}
+          >
+            {%- for block in ad_blocks -%}
+              {%- if block.settings.image != blank -%}
+                <a
+                  class="birdlabs-admq__slot"
+                  href="{{ block.settings.link | default: '#' }}"
+                  {% if pass == 2 %}tabindex="-1"{% endif %}
+                  {{ block.shopify_attributes }}
+                >
+                  {{
+                    block.settings.image
+                    | image_url: width: 800
+                    | image_tag: class: 'birdlabs-admq__img', loading: 'lazy', alt: block.settings.alt
+                  }}
+                </a>
+              {%- else -%}
+                <span class="birdlabs-admq__slot birdlabs-admq__slot--empty" aria-hidden="true"></span>
+              {%- endif -%}
+            {%- endfor -%}
+
+            {%- comment -%}
+              Unbooked inventory. The strip keeps its shape and the gap is visible — which is
+              the point of the original design, not an oversight.
+            {%- endcomment -%}
+            {%- for i in (1..placeholders) -%}
+              <span class="birdlabs-admq__slot birdlabs-admq__slot--empty" aria-hidden="true"></span>
+            {%- endfor -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .birdlabs-admq {
+    width: 100%;
+    overflow: hidden;
+    padding: 8px 0;
+    background: var(--admq-bg, transparent);
+    border-bottom: 1px solid var(--admq-border, rgb(255 255 255 / 8%));
+  }
+
+  .birdlabs-admq__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--admq-gap, 12px);
+  }
+
+  .birdlabs-admq__lead {
+    flex: 0 0 auto;
+    padding-left: var(--admq-gap, 12px);
+  }
+
+  .birdlabs-admq__viewport {
+    flex: 1 1 auto;
+    overflow: hidden;
+  }
+
+  .birdlabs-admq__track {
+    display: flex;
+    width: max-content;
+    animation: birdlabs-admq-scroll var(--admq-speed, 18s) linear infinite;
+  }
+
+  .birdlabs-admq--reverse .birdlabs-admq__track { animation-direction: reverse; }
+
+  /* Pause so a moving link can actually be clicked, or reached by keyboard. */
+  .birdlabs-admq:hover .birdlabs-admq__track,
+  .birdlabs-admq:focus-within .birdlabs-admq__track { animation-play-state: paused; }
+
+  .birdlabs-admq__run {
+    display: flex;
+    gap: var(--admq-gap, 12px);
+    padding-right: var(--admq-gap, 12px);
+  }
+
+  /*
+   * Two identical runs sit side by side; shifting the track by exactly half its width lands
+   * the second run where the first began, so the restart is invisible.
+   */
+  @keyframes birdlabs-admq-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  .birdlabs-admq__slot {
+    display: block;
+    flex: 0 0 auto;
+    width: var(--admq-slot-w, 300px);
+    height: var(--admq-slot-h, 100px);
+    overflow: hidden;
+    border-radius: 6px;
+  }
+
+  .birdlabs-admq__img {
+    width: 100%;
+    height: 100%;
+    /* Letterbox odd-sized creatives rather than stretching them. */
+    object-fit: contain;
+    background: rgb(0 0 0 / 4%);
+  }
+
+  /* Unbooked slot: visible inventory, not a hole in the strip. */
+  .birdlabs-admq__slot--empty {
+    background: repeating-linear-gradient(
+      45deg,
+      rgb(0 0 0 / 12%),
+      rgb(0 0 0 / 12%) 10px,
+      rgb(0 0 0 / 6%) 10px,
+      rgb(0 0 0 / 6%) 20px
+    );
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 15%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .birdlabs-admq__track { animation: none; }
+    /* Without motion the duplicate run is dead weight — hide it. */
+    .birdlabs-admq__run + .birdlabs-admq__run { display: none; }
+    .birdlabs-admq__viewport { overflow-x: auto; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Birdlabs Ad Marquee",
+  "tag": "section",
+  "class": "birdlabs-admq-wrapper",
+  "max_blocks": 20,
+  "blocks": [
+    {
+      "type": "slot",
+      "name": "Ad slot",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Creative" },
+        { "type": "url", "id": "link", "label": "Links to" },
+        { "type": "text", "id": "alt", "label": "Alt text", "info": "Describes the ad for screen readers." }
+      ]
+    },
+    {
+      "type": "lead_in",
+      "name": "Lead-in slot",
+      "limit": 1,
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Creative" },
+        { "type": "url", "id": "link", "label": "Links to" },
+        { "type": "text", "id": "alt", "label": "Alt text" }
+      ]
+    }
+  ],
+  "settings": [
+    { "type": "header", "content": "Strip" },
+    {
+      "type": "range",
+      "id": "total_slots",
+      "label": "Slots in the strip",
+      "info": "Slots beyond the ad blocks you have added render as striped placeholders, so unsold inventory stays visible.",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "default": 5
+    },
+    { "type": "range", "id": "slot_width", "label": "Slot width", "min": 120, "max": 600, "step": 10, "unit": "px", "default": 300 },
+    { "type": "range", "id": "slot_height", "label": "Slot height", "min": 40, "max": 300, "step": 10, "unit": "px", "default": 100 },
+    { "type": "range", "id": "gap", "label": "Gap between slots", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 12 },
+    { "type": "header", "content": "Motion" },
+    {
+      "type": "range",
+      "id": "scroll_speed",
+      "label": "Time for one full pass",
+      "info": "Higher is slower. Pauses on hover and on keyboard focus.",
+      "min": 5,
+      "max": 90,
+      "step": 1,
+      "unit": "s",
+      "default": 18
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Direction",
+      "default": "left",
+      "options": [
+        { "value": "left", "label": "Right to left" },
+        { "value": "right", "label": "Left to right" }
+      ]
+    },
+    { "type": "header", "content": "Lead-in" },
+    {
+      "type": "checkbox",
+      "id": "show_lead_in",
+      "label": "Show a fixed lead-in slot",
+      "info": "Sits before the strip and stays put while the rest scrolls.",
+      "default": false
+    },
+    { "type": "range", "id": "lead_in_width", "label": "Lead-in width", "min": 120, "max": 600, "step": 10, "unit": "px", "default": 300 },
+    { "type": "header", "content": "Appearance" },
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#12002a" },
+    { "type": "color", "id": "border_color", "label": "Bottom border", "default": "#2a1247" }
+  ],
+  "presets": [
+    {
+      "name": "Birdlabs Ad Marquee",
+      "blocks": [{ "type": "slot" }, { "type": "slot" }]
+    }
+  ]
+}
+{% endschema %}

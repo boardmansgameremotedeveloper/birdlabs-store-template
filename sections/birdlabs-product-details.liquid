@@ -1,0 +1,359 @@
+{% comment %}
+  sections/birdlabs-product-details.liquid
+
+  Tabbed product detail panel, driven by product metafields.
+  Informed by buyflorabella.com's product page (Overview / What's Inside / How to Use /
+  Technical / FAQ, plus a key-benefits checklist and a shared trust row).
+
+  THE PROBLEM THIS IS DESIGNED AROUND
+
+  The developer's words: "an overly complex layout per product, which becomes a per-product
+  management nightmare as more products are expanded." Looking at the source, the nightmare
+  is not metafields — it is how they were modelled:
+
+    custom.product_overview            \
+    custom.product_overview_multiline   >  three fields, one concept, none authoritative
+    custom.product_overview_richtext   /
+    custom.key_benefits_parsable          a list stored as a delimited string
+
+  Four consequences, all of which this section is built to avoid:
+
+  1. A tab whose metafield is empty is SKIPPED, not rendered blank. A product with two of
+     five tabs filled looks finished, not broken. This is what makes 40 products tractable:
+     you fill what you have.
+  2. Tabs are BLOCKS. Which tabs exist, their labels, and which metafield feeds each one are
+     merchant-editable — no theme edit to add or drop a tab.
+  3. The namespace and key per tab are settings, so this renders an EXISTING store's
+     metafields as they are. Nothing has to be renamed before it displays.
+  4. Content shared by every product — the trust badges — lives in SECTION settings, not in
+     per-product metafields. Most of what looks per-product is not, and that distinction is
+     the actual fix for the scaling problem.
+
+  Legacy support: `list_delimiter` splits a "parsable" string field into list items, so a
+  store already using that pattern works today and can migrate to a native
+  list.single_line_text_field later without touching the theme.
+{% endcomment %}
+
+{%- liquid
+  assign has_tabs = false
+  for block in section.blocks
+    if block.type == 'tab'
+      assign ns = block.settings.namespace | default: 'custom'
+      assign field = product.metafields[ns][block.settings.key]
+      if field != blank
+        assign has_tabs = true
+      endif
+    endif
+  endfor
+-%}
+
+{%- if has_tabs or section.blocks.size > 0 -%}
+  <section class="birdlabs-pdetails" data-section-id="{{ section.id }}">
+    <div class="birdlabs-pdetails__inner">
+      {%- comment -%} Shared, not per-product: same on every page, edited once. {%- endcomment -%}
+      {%- assign trust_blocks = section.blocks | where: 'type', 'trust' -%}
+      {%- if trust_blocks.size > 0 -%}
+        <div class="birdlabs-pdetails__trust">
+          {%- for block in trust_blocks -%}
+            <div class="birdlabs-pdetails__trust-item" {{ block.shopify_attributes }}>
+              {%- if block.settings.icon != blank -%}
+                <span class="birdlabs-pdetails__trust-icon" aria-hidden="true">
+                  {{- block.settings.icon | escape -}}
+                </span>
+              {%- endif -%}
+              <span class="birdlabs-pdetails__trust-title">{{ block.settings.title | escape }}</span>
+              {%- if block.settings.subtitle != blank -%}
+                <span class="birdlabs-pdetails__trust-sub">{{ block.settings.subtitle | escape }}</span>
+              {%- endif -%}
+            </div>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      {%- if has_tabs -%}
+        <div class="birdlabs-pdetails__tabs" role="tablist">
+          {%- assign tab_index = 0 -%}
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'tab' -%}
+              {%- liquid
+                assign ns = block.settings.namespace | default: 'custom'
+                assign field = product.metafields[ns][block.settings.key]
+              -%}
+              {%- if field != blank -%}
+                <button
+                  class="birdlabs-pdetails__tab{% if tab_index == 0 %} is-active{% endif %}"
+                  type="button"
+                  role="tab"
+                  aria-selected="{% if tab_index == 0 %}true{% else %}false{% endif %}"
+                  aria-controls="bpd-{{ section.id }}-{{ forloop.index0 }}"
+                  data-tab="{{ forloop.index0 }}"
+                >
+                  {{ block.settings.label | escape }}
+                </button>
+                {%- assign tab_index = tab_index | plus: 1 -%}
+              {%- endif -%}
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+
+        <div class="birdlabs-pdetails__panels">
+          {%- assign panel_index = 0 -%}
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'tab' -%}
+              {%- liquid
+                assign ns = block.settings.namespace | default: 'custom'
+                assign field = product.metafields[ns][block.settings.key]
+              -%}
+              {%- if field != blank -%}
+                <div
+                  class="birdlabs-pdetails__panel{% if panel_index == 0 %} is-active{% endif %}"
+                  id="bpd-{{ section.id }}-{{ forloop.index0 }}"
+                  role="tabpanel"
+                  data-panel="{{ forloop.index0 }}"
+                  {{ block.shopify_attributes }}
+                >
+                  {%- if block.settings.heading != blank -%}
+                    <h2 class="birdlabs-pdetails__heading">{{ block.settings.heading | escape }}</h2>
+                  {%- endif -%}
+
+                  {%- case block.settings.render_as -%}
+                    {%- when 'list' -%}
+                      {%- liquid
+                        assign items = field.value
+                        # A "parsable" string field: split it rather than demanding a rename.
+                        if block.settings.list_delimiter != blank
+                          assign items = field.value | split: block.settings.list_delimiter
+                        endif
+                      -%}
+                      <ul class="birdlabs-pdetails__list">
+                        {%- for item in items -%}
+                          {%- assign line = item | strip -%}
+                          {%- if line != blank -%}
+                            <li class="birdlabs-pdetails__list-item">{{ line | escape }}</li>
+                          {%- endif -%}
+                        {%- endfor -%}
+                      </ul>
+
+                    {%- when 'text' -%}
+                      <div class="birdlabs-pdetails__prose">
+                        {{ field.value | escape | newline_to_br }}
+                      </div>
+
+                    {%- else -%}
+                      {%- comment -%}
+                        rich_text_field and multi_line_text_field render through metafield_tag,
+                        which emits the correct markup for the field's own type.
+                      {%- endcomment -%}
+                      <div class="birdlabs-pdetails__prose">{{ field | metafield_tag }}</div>
+                  {%- endcase -%}
+                </div>
+                {%- assign panel_index = panel_index | plus: 1 -%}
+              {%- endif -%}
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </section>
+
+  <script src="{{ 'birdlabs-product-details.js' | asset_url }}" defer></script>
+{%- endif -%}
+
+{% stylesheet %}
+  .birdlabs-pdetails { padding: 48px 24px; }
+
+  .birdlabs-pdetails__inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .birdlabs-pdetails__trust {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+
+  .birdlabs-pdetails__trust-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 16px;
+    border: 1px solid rgb(0 0 0 / 10%);
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  .birdlabs-pdetails__trust-icon { font-size: 1.25rem; }
+
+  .birdlabs-pdetails__trust-title {
+    font-family: var(--font-body--family);
+    font-size: 0.8125rem;
+    font-weight: 700;
+  }
+
+  .birdlabs-pdetails__trust-sub {
+    font-family: var(--font-body--family);
+    font-size: 0.6875rem;
+    opacity: 0.6;
+  }
+
+  .birdlabs-pdetails__tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 4px;
+    overflow-x: auto;
+    border-bottom: 1px solid rgb(0 0 0 / 12%);
+  }
+
+  .birdlabs-pdetails__tab {
+    flex: 0 0 auto;
+    padding: 12px 20px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: none;
+    color: inherit;
+    font-family: var(--font-body--family);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s ease, border-color 0.2s ease;
+  }
+
+  .birdlabs-pdetails__tab:hover { opacity: 1; }
+
+  .birdlabs-pdetails__tab.is-active {
+    border-bottom-color: var(--birdlabs-accent, currentColor);
+    opacity: 1;
+  }
+
+  .birdlabs-pdetails__panel { display: none; padding: 28px 4px 0; }
+  .birdlabs-pdetails__panel.is-active { display: block; }
+
+  .birdlabs-pdetails__heading {
+    margin: 0 0 14px;
+    font-family: var(--font-heading--family);
+    font-size: 1.375rem;
+  }
+
+  .birdlabs-pdetails__prose {
+    font-family: var(--font-body--family);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+  }
+
+  .birdlabs-pdetails__prose > * + * { margin-top: 1em; }
+
+  .birdlabs-pdetails__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 10px 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .birdlabs-pdetails__list-item {
+    position: relative;
+    padding-left: 26px;
+    font-family: var(--font-body--family);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  /* Check mark drawn in CSS — no icon asset, no per-product markup. */
+  .birdlabs-pdetails__list-item::before {
+    content: '';
+    position: absolute;
+    top: 0.45em;
+    left: 4px;
+    width: 10px;
+    height: 5px;
+    border-left: 2px solid var(--birdlabs-accent, currentColor);
+    border-bottom: 2px solid var(--birdlabs-accent, currentColor);
+    rotate: -45deg;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .birdlabs-pdetails__tab { transition: none; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Birdlabs Product Details",
+  "tag": "section",
+  "class": "birdlabs-pdetails-wrapper",
+  "enabled_on": { "templates": ["product"] },
+  "max_blocks": 12,
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "Metafield tab",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Tab label", "default": "Overview" },
+        { "type": "text", "id": "heading", "label": "Panel heading", "default": "Product overview" },
+        {
+          "type": "text",
+          "id": "namespace",
+          "label": "Metafield namespace",
+          "default": "custom"
+        },
+        {
+          "type": "text",
+          "id": "key",
+          "label": "Metafield key",
+          "info": "The tab is hidden entirely on products where this metafield is empty — a sparse product looks finished, not broken.",
+          "default": "product_overview"
+        },
+        {
+          "type": "select",
+          "id": "render_as",
+          "label": "Render as",
+          "default": "rich",
+          "options": [
+            { "value": "rich", "label": "Rich text / multi-line (auto)" },
+            { "value": "list", "label": "Checklist" },
+            { "value": "text", "label": "Plain text" }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "list_delimiter",
+          "label": "Split list on",
+          "info": "Only for checklists stored as one delimited string. Leave blank for a native list metafield."
+        }
+      ]
+    },
+    {
+      "type": "trust",
+      "name": "Trust badge",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "These are section settings, not product metafields — identical across the catalogue, edited once. Keeping shared content out of per-product fields is what stops a large catalogue becoming unmanageable."
+        },
+        { "type": "text", "id": "icon", "label": "Icon", "info": "An emoji. Optional." },
+        { "type": "text", "id": "title", "label": "Title", "default": "Secure payment" },
+        { "type": "text", "id": "subtitle", "label": "Subtitle" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Birdlabs Product Details",
+      "blocks": [
+        { "type": "trust", "settings": { "icon": "✅", "title": "Quality sourced", "subtitle": "Carefully selected inputs" } },
+        { "type": "trust", "settings": { "icon": "🔁", "title": "Consistent supply", "subtitle": "Reliable, repeatable fulfilment" } },
+        { "type": "trust", "settings": { "icon": "🔒", "title": "Secure payment", "subtitle": "SSL encrypted" } },
+        { "type": "tab", "settings": { "label": "Overview", "heading": "Product overview", "key": "product_overview", "render_as": "rich" } },
+        { "type": "tab", "settings": { "label": "Key benefits", "heading": "Key benefits", "key": "key_benefits", "render_as": "list" } },
+        { "type": "tab", "settings": { "label": "How to use", "heading": "How to use", "key": "how_to_use", "render_as": "rich" } },
+        { "type": "tab", "settings": { "label": "Technical", "heading": "Technical detail", "key": "technical", "render_as": "rich" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
