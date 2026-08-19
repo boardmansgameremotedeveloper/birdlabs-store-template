@@ -179,46 +179,10 @@
             "link": "/collections/demo-buyflorabella",
             "alt": "Flora Bella \u2014 wake up your soil"
           }
-        },
-        "s2": {
-          "type": "slot",
-          "settings": {
-            "image": "",
-            "link": "",
-            "alt": ""
-          }
-        },
-        "s3": {
-          "type": "slot",
-          "settings": {
-            "image": "",
-            "link": "",
-            "alt": ""
-          }
-        },
-        "s4": {
-          "type": "slot",
-          "settings": {
-            "image": "",
-            "link": "",
-            "alt": ""
-          }
-        },
-        "s5": {
-          "type": "slot",
-          "settings": {
-            "image": "",
-            "link": "",
-            "alt": ""
-          }
         }
       },
       "block_order": [
-        "s1",
-        "s2",
-        "s3",
-        "s4",
-        "s5"
+        "s1"
       ],
       "settings": {
         "total_slots": 5,
@@ -231,7 +195,8 @@
         "border_color": "",
         "stripe_color": "",
         "fallback_collection": "demo-buyflorabella",
-        "empty_label": "Advertise here"
+        "empty_label": "Advertise here",
+        "advertise_slots": 1
       }
     },
     "birdlabs_callback": {

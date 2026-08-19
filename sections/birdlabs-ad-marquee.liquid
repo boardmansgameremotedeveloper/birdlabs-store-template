@@ -94,9 +94,15 @@
                   }}
                 </a>
               {%- else -%}
+                {%- liquid
+                  assign mode = 'product'
+                  if forloop.index0 < section.settings.advertise_slots
+                    assign mode = 'advertise'
+                  endif
+                -%}
                 {%- render 'birdlabs-admq-empty',
                   filler: filler, index: forloop.index0, pass: pass,
-                  label: section.settings.empty_label -%}
+                  mode: mode, label: section.settings.empty_label -%}
               {%- endif -%}
             {%- endfor -%}
 
@@ -105,10 +111,19 @@
               the point of the original design, not an oversight.
             {%- endcomment -%}
             {%- for i in (1..placeholders) -%}
-              {%- assign offset = ad_blocks.size | plus: forloop.index0 -%}
+              {%- liquid
+                # Product choice uses the overall position so slots show different items…
+                assign offset = ad_blocks.size | plus: forloop.index0
+                # …but the advertise/house split counts UNFILLED slots only. Using the
+                # overall offset made `1 < 1` false and produced zero open slots.
+                assign mode = 'product'
+                if forloop.index0 < section.settings.advertise_slots
+                  assign mode = 'advertise'
+                endif
+              -%}
               {%- render 'birdlabs-admq-empty',
                 filler: filler, index: offset, pass: pass,
-                label: section.settings.empty_label -%}
+                mode: mode, label: section.settings.empty_label -%}
             {%- endfor -%}
           </div>
         {%- endfor -%}
@@ -187,6 +202,47 @@
    * because a black-on-dark placeholder is invisible — which defeats the entire point of
    * showing unsold inventory. Default suits a dark bar; lighten it for a light one.
    */
+  /* House ad: product image with its name and price over a readable scrim. */
+  .birdlabs-admq__slot--product {
+    position: relative;
+    display: block;
+    background: var(--bl-surface);
+    text-decoration: none;
+  }
+
+  .birdlabs-admq__house-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .birdlabs-admq__house-body {
+    position: absolute;
+    inset: auto 0 0 0;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 10px;
+    background: linear-gradient(to top, rgb(0 0 0 / 72%), rgb(0 0 0 / 0%));
+    color: #fff;
+  }
+
+  .birdlabs-admq__house-name {
+    overflow: hidden;
+    font-family: var(--font-body--family);
+    font-size: 0.75rem;
+    font-weight: 700;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .birdlabs-admq__house-price {
+    flex: 0 0 auto;
+    font-family: var(--font-body--family);
+    font-size: 0.75rem;
+  }
+
   .birdlabs-admq__empty-label {
     display: flex;
     align-items: center;
@@ -268,6 +324,16 @@
       "id": "fallback_collection",
       "label": "Products for unfilled slots",
       "info": "Leave blank to use the whole catalogue."
+    },
+    {
+      "type": "range",
+      "id": "advertise_slots",
+      "label": "Open \"advertise here\" slots",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "default": 1,
+      "info": "Unfilled slots beyond this many become house ads showing a real product, so the strip still merchandises."
     },
     {
       "type": "text",
