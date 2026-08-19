@@ -27,6 +27,24 @@
   var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   /**
+   * Horizon does NOT scroll the window on desktop.
+   *
+   * assets/base.css sets `html, body { height: 100dvh; overflow: hidden }` at >=990px and
+   * makes `.page-wrapper` the scroll container (`overflow-y: auto`). So `window.scrollTo`
+   * is silently a no-op there — verified: scrollTo(0, 1500) left window.scrollY at 0.
+   * Below 990px the window scrolls normally. Resolve it at call time rather than caching,
+   * because a viewport resize crosses that boundary.
+   */
+  function scroller() {
+    var wrapper = document.querySelector('.page-wrapper');
+    if (wrapper && wrapper.scrollHeight > wrapper.clientHeight + 1) {
+      var overflowY = getComputedStyle(wrapper).overflowY;
+      if (overflowY === 'auto' || overflowY === 'scroll') return wrapper;
+    }
+    return window;
+  }
+
+  /**
    * Horizon publishes the measured header height as --header-height on :root, set before
    * first paint and kept fresh by header.js. Reading it means we follow a transparent,
    * sticky or resized header instead of guessing a fixed offset.
@@ -34,18 +52,36 @@
   function headerOffset() {
     var raw = getComputedStyle(document.documentElement).getPropertyValue('--header-height');
     var px = parseFloat(raw);
-    return isNaN(px) ? 0 : px;
+    if (!isNaN(px) && px > 0) return px;
+    // Fall back to measuring a sticky/fixed header, since --header-height is only set by
+    // Horizon's own header and a custom one may not publish it.
+    var hdr = document.querySelector('.birdlabs-header--sticky, header[class*="header"]');
+    if (hdr) {
+      var pos = getComputedStyle(hdr).position;
+      if (pos === 'sticky' || pos === 'fixed') return hdr.offsetHeight;
+    }
+    return 0;
   }
 
   function scrollToTarget(target, push) {
     if (!target) return;
 
-    var top = target.getBoundingClientRect().top + window.pageYOffset - headerOffset();
+    var box = scroller();
+    var behavior = REDUCED.matches ? 'auto' : 'smooth';
+    var top;
 
-    window.scrollTo({
-      top: top < 0 ? 0 : top,
-      behavior: REDUCED.matches ? 'auto' : 'smooth'
-    });
+    if (box === window) {
+      top = target.getBoundingClientRect().top + window.pageYOffset - headerOffset();
+      window.scrollTo({ top: top < 0 ? 0 : top, behavior: behavior });
+    } else {
+      // Position of the target relative to the scroll container's current scroll offset.
+      top =
+        target.getBoundingClientRect().top -
+        box.getBoundingClientRect().top +
+        box.scrollTop -
+        headerOffset();
+      box.scrollTo({ top: top < 0 ? 0 : top, behavior: behavior });
+    }
 
     // Move keyboard focus to the target so the jump is not sighted-users-only.
     // tabindex="-1" makes a non-interactive element focusable without adding it to

@@ -24,23 +24,48 @@ class BirdlabsHeader extends HTMLElement {
 
     // passive: this listener never calls preventDefault, so the browser need not wait
     // for it before scrolling.
+    // Horizon scrolls .page-wrapper on desktop, not the window (assets/base.css) — listen
+    // to both so `.is-scrolled` fires whichever one is the scroller at this viewport.
+    this.scrollBox = document.querySelector('.page-wrapper');
     window.addEventListener('scroll', this.onScroll, { passive: true });
+    this.scrollBox?.addEventListener('scroll', this.onScroll, { passive: true });
     this.burger?.addEventListener('click', this.onBurger);
     this.cartBtn?.addEventListener('click', this.onCart);
     document.addEventListener('shopify:cart:lines-update', this.onCartUpdate);
 
+    this.publishHeight();
     this.onScroll();
+
+    // Republish on resize: the height changes with the viewport, and anything offsetting
+    // against a sticky header needs the current value.
+    if ('ResizeObserver' in window) {
+      this.ro = new ResizeObserver(() => this.publishHeight());
+      this.ro.observe(this);
+    }
+  }
+
+  /**
+   * Publish --header-height, which Horizon's own header sets and other code offsets
+   * against. A custom header that omits it leaves the variable EMPTY — measured on this
+   * page — so anchor scrolling silently loses its offset. Set it ourselves.
+   */
+  publishHeight() {
+    const h = this.offsetHeight;
+    if (h > 0) document.documentElement.style.setProperty('--header-height', `${h}px`);
   }
 
   disconnectedCallback() {
+    this.ro?.disconnect();
     window.removeEventListener('scroll', this.onScroll);
+    this.scrollBox?.removeEventListener('scroll', this.onScroll);
     this.burger?.removeEventListener('click', this.onBurger);
     this.cartBtn?.removeEventListener('click', this.onCart);
     document.removeEventListener('shopify:cart:lines-update', this.onCartUpdate);
   }
 
   onScroll() {
-    this.classList.toggle('is-scrolled', window.scrollY > 8);
+    const y = this.scrollBox ? this.scrollBox.scrollTop : 0;
+    this.classList.toggle('is-scrolled', Math.max(window.scrollY, y) > 8);
   }
 
   onBurger() {
@@ -54,10 +79,14 @@ class BirdlabsHeader extends HTMLElement {
   }
 
   onCart(event) {
-    // Only intercept when the drawer actually exists. Otherwise let the click follow
-    // the href to /cart, which is why the markup uses a real link.
-    const drawer = document.querySelector('cart-drawer-component');
-    if (!drawer || typeof drawer.open !== 'function') return;
+    // `cart-drawer-component` has no open() of its own — it resolves
+    // `this.closest('theme-drawer')` and drives that (assets/cart-drawer.js:22). So the
+    // element to open is the theme-drawer WRAPPING the cart drawer, not the cart drawer.
+    // Verified: cart-drawer-component's prototype exposes only constructor and the
+    // connected/disconnected callbacks.
+    const cart = document.querySelector('cart-drawer-component');
+    const drawer = cart && cart.closest('theme-drawer');
+    if (!drawer || typeof drawer.open !== 'function') return; // fall through to href=/cart
     event.preventDefault();
     drawer.open();
   }
